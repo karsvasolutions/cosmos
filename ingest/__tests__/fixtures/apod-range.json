@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2026-04-22",
+    "title": "Cosmic Cliffs in the Carina Nebula",
+    "explanation": "Captured by JWST in July 2022, the \"Cosmic Cliffs\" region of the Carina Nebula reveals previously invisible areas of star birth.",
+    "url": "https://apod.nasa.gov/apod/image/2604/CarinaCliffs.jpg",
+    "hdurl": "https://apod.nasa.gov/apod/image/2604/CarinaCliffs_hd.jpg",
+    "media_type": "image",
+    "copyright": "NASA, ESA, CSA, STScI"
+  },
+  {
+    "date": "2026-04-21",
+    "title": "A Movie of Mars",
+    "explanation": "<p>A short video stitched from rover stills.</p>",
+    "url": "https://www.youtube.com/embed/abc",
+    "media_type": "video"
+  },
+  {
+    "date": "2026-04-20",
+    "title": "Andromeda at Night",
+    "explanation": "Our nearest large galactic neighbour.",
+    "url": "https://apod.nasa.gov/apod/image/2604/Andromeda.jpg",
+    "hdurl": "https://apod.nasa.gov/apod/image/2604/Andromeda_hd.jpg",
+    "media_type": "image"
+  }
+]
