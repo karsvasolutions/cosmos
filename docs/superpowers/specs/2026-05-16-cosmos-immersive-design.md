@@ -150,7 +150,7 @@ Responsibilities:
 
 - Render markup for the title, date, description, credit, and source link.
 - Slide-up animation (~250ms) over the bottom 55% of the viewport.
-- Translucent panel: `rgba(10,10,15,0.95)` + `backdrop-filter: blur(6px)` + 1px top border `rgba(255,255,255,0.08)`.
+- Translucent panel: `rgba(0,0,0,0.45)` + `backdrop-filter: blur(24px) saturate(140%)` + 1px top border `rgba(255,255,255,0.08)`. The image stays visible (and softly blurred) behind the panel — the goal is "the image is still the canvas; text floats over it."
 - Close on `esc`, on click of image area, or on advance.
 
 ### `ingest/` — data pipeline
@@ -212,7 +212,7 @@ Body uses `line-height: 1.65` and `max-width: 60ch` for comfortable reading.
   --text-secondary:   #B0B0B0;       /* info sheet body */
   --text-muted:       #777777;       /* chrome labels — meets 4.5:1 on #000 */
   --hairline:         rgba(255,255,255,0.08);
-  --sheet-bg:         rgba(10,10,15,0.92);
+  --sheet-bg:         rgba(0, 0, 0, 0.45);    /* image stays visible through panel */
   --focus-ring:       rgba(220,220,255,0.65);
 }
 ```

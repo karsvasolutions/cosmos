@@ -8,7 +8,7 @@
   --text-secondary:   #B0B0B0;
   --text-muted:       #777777;
   --hairline:         rgba(255, 255, 255, 0.08);
-  --sheet-bg:         rgba(10, 10, 15, 0.92);
+  --sheet-bg:         rgba(0, 0, 0, 0.45);
   --focus-ring:       rgba(220, 220, 255, 0.65);
 
   --motion-fade:      400ms;
