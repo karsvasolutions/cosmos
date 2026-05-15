@@ -22,8 +22,12 @@ export function truncate(text: string, maxLen = 600): string {
   return base + '…';
 }
 
+// Safety cap on full APOD explanations — well above the typical 1500-char
+// length, low enough that a single malformed entry can't blow up the JSON.
+const DESCRIPTION_CAP = 5000;
+
 export function cleanDescription(raw: string): string {
-  return truncate(decodeEntities(stripHtml(raw)));
+  return truncate(decodeEntities(stripHtml(raw)), DESCRIPTION_CAP);
 }
 
 export function isValidImage(img: Image): boolean {

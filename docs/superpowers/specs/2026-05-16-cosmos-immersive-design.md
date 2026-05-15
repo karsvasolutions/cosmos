@@ -92,7 +92,7 @@ type Image = {
 
 **Normalization rules:**
 
-- `description` — strip HTML from feed content. If longer than 600 characters, truncate at a word boundary and append `…`.
+- `description` — strip HTML from feed content. Preserve the full APOD explanation; only apply a safety cap at 5000 characters (truncate at a word boundary, append `…`) so a single misbehaving entry can't blow up the JSON. The info sheet scrolls if the text overflows.
 - `imageUrl` — uses APOD's `hdurl` (the highest-resolution variant). Entries without an `hdurl` fall back to the regular `url`.
 
 **Filtering rules:**
