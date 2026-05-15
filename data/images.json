@@ -1,0 +1,22 @@
+[
+  {
+    "id": "example-1",
+    "source": "apod",
+    "title": "Cosmic Cliffs (placeholder)",
+    "date": "2026-04-22",
+    "credit": "NASA, ESA, CSA, STScI",
+    "sourceUrl": "https://apod.nasa.gov/apod/ap260422.html",
+    "imageUrl": "https://apod.nasa.gov/apod/image/2207/CosmicCliffs_Webb_960.jpg",
+    "description": "Example entry. Replace by running `npm run fetch` with NASA_API_KEY set."
+  },
+  {
+    "id": "example-2",
+    "source": "hubble",
+    "title": "Pillars of Creation (placeholder)",
+    "date": "2026-04-20",
+    "credit": "NASA, ESA, Hubble Heritage Team",
+    "sourceUrl": "https://esahubble.org/",
+    "imageUrl": "https://cdn.esahubble.org/archives/images/screen/heic9544a.jpg",
+    "description": "Example entry. Replace by running `npm run fetch`."
+  }
+]
