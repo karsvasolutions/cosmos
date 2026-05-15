@@ -1,13 +1,10 @@
 import { resolve } from 'node:path';
 import { fetchApod } from './sources/apod';
-import { fetchHubble } from './sources/hubble';
-import { fetchWebb } from './sources/webb';
 import { mergeAndCap, writeImages } from './write';
 import type { Image } from './types';
 
 const MAX_ENTRIES = 500;
 const MIN_ENTRIES = 50;
-const APOD_TARGET = 250;
 const OUTPUT = resolve(process.cwd(), 'data/images.json');
 
 async function safeFetch(
@@ -28,16 +25,12 @@ async function main() {
   const keepOnEmpty = process.argv.includes('--keep-on-empty');
   const apiKey = process.env.NASA_API_KEY ?? '';
 
-  const [apod, hubble, webb] = await Promise.all([
-    safeFetch('APOD', () =>
-      fetchApod({ apiKey, maxEntries: APOD_TARGET }),
-    ),
-    safeFetch('Hubble', fetchHubble),
-    safeFetch('Webb', fetchWebb),
-  ]);
+  const apod = await safeFetch('APOD', () =>
+    fetchApod({ apiKey, maxEntries: MAX_ENTRIES }),
+  );
 
-  const merged = mergeAndCap([...apod, ...hubble, ...webb], MAX_ENTRIES);
-  console.log(`Total after merge/dedupe/cap: ${merged.length}`);
+  const merged = mergeAndCap(apod, MAX_ENTRIES);
+  console.log(`Total after dedupe/cap: ${merged.length}`);
 
   if (merged.length < MIN_ENTRIES) {
     if (keepOnEmpty) {
@@ -47,9 +40,7 @@ async function main() {
       writeImages(OUTPUT, merged, { keepOnEmpty: true });
       return;
     }
-    console.error(
-      `FAIL: only ${merged.length} entries (min ${MIN_ENTRIES})`,
-    );
+    console.error(`FAIL: only ${merged.length} entries (min ${MIN_ENTRIES})`);
     process.exit(1);
   }
 

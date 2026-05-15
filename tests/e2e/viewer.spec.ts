@@ -7,10 +7,10 @@ const ONE_PX_PNG = Buffer.from(
 );
 
 test.beforeEach(async ({ page }) => {
-  // Intercept any image GET to apod.nasa.gov / esahubble.org / esawebb.org and
-  // return a tiny PNG so onload always fires regardless of network state.
+  // Intercept any image GET to apod.nasa.gov and return a tiny PNG so
+  // onload always fires regardless of network state.
   await page.route(
-    /https?:\/\/(apod\.nasa\.gov|cdn\.esahubble\.org|cdn\.esawebb\.org)\/.*/,
+    /https?:\/\/apod\.nasa\.gov\/.*/,
     (route) => route.fulfill({ status: 200, contentType: 'image/png', body: ONE_PX_PNG }),
   );
 });

@@ -11,12 +11,12 @@
   },
   {
     "id": "example-2",
-    "source": "hubble",
-    "title": "Pillars of Creation (placeholder)",
+    "source": "apod",
+    "title": "Andromeda Galaxy (placeholder)",
     "date": "2026-04-20",
-    "credit": "NASA, ESA, Hubble Heritage Team",
-    "sourceUrl": "https://esahubble.org/",
-    "imageUrl": "https://cdn.esahubble.org/archives/images/screen/heic9544a.jpg",
+    "credit": "NASA, ESA",
+    "sourceUrl": "https://apod.nasa.gov/apod/ap260420.html",
+    "imageUrl": "https://apod.nasa.gov/apod/image/9907/M31_subaru_big.jpg",
     "description": "Example entry. Replace by running `npm run fetch`."
   }
 ]

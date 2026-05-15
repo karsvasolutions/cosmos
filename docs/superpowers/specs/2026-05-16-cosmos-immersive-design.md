@@ -68,19 +68,19 @@ Static site, built with Astro, deployed to Vercel free tier. Daily rebuild via G
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Image binaries stay on NASA/ESA CDNs — the site stores only URLs and metadata. Expected `images.json` size: 200–400 KB for 500 entries.
+Image binaries stay on NASA's CDN — the site stores only URLs and metadata. Expected `images.json` size: 200–400 KB for 500 entries.
 
 ## Data model
 
 ```ts
 type Image = {
   id: string;              // stable hash, e.g. "apod-2026-04-22"
-  source: "apod" | "hubble" | "webb";
+  source: "apod";          // NASA APOD is the sole source for beta
   title: string;           // "Cosmic Cliffs in the Carina Nebula"
   date: string;            // ISO date the image was released (YYYY-MM-DD)
   credit: string;          // "NASA, ESA, CSA, STScI"
-  sourceUrl: string;       // canonical page on the source site
-  imageUrl: string;        // highest-resolution variant available
+  sourceUrl: string;       // canonical page on apod.nasa.gov
+  imageUrl: string;        // APOD's `hdurl` (the highest-resolution variant)
   imageUrlPreview?: string;// smaller variant for preload, if available
   width?: number;          // when known — prevents layout shift
   height?: number;
@@ -93,12 +93,12 @@ type Image = {
 **Normalization rules:**
 
 - `description` — strip HTML from feed content. If longer than 600 characters, truncate at a word boundary and append `…`.
-- `imageUrl` — must point to the highest-resolution variant the source offers (APOD's `hdurl`, ESA's full-size original). Entries with only a thumbnail are skipped.
+- `imageUrl` — uses APOD's `hdurl` (the highest-resolution variant). Entries without an `hdurl` fall back to the regular `url`.
 
 **Filtering rules:**
 
-- APOD entries where `media_type !== "image"` (videos) — skipped.
-- Entries missing a credit string — skipped.
+- Entries where `media_type !== "image"` (videos) — skipped.
+- Entries missing a credit string (`copyright`) — skipped. APOD includes credit for nearly every image.
 - Duplicates (same `imageUrl`) — first occurrence wins.
 
 ## Repository layout
@@ -121,9 +121,7 @@ data/
 ingest/
   index.ts                   ← entrypoint for `npm run fetch`
   sources/
-    apod.ts                  ← APOD adapter
-    hubble.ts                ← ESA/Hubble adapter
-    webb.ts                  ← ESA/Webb adapter
+    apod.ts                  ← APOD adapter (sole source)
   normalize.ts               ← Image shape + filters
   write.ts                   ← merge, sort, cap to 500, write JSON
 .github/
@@ -159,26 +157,24 @@ Responsibilities:
 
 `ingest/index.ts` is the entrypoint run by `npm run fetch`:
 
-1. Calls each source adapter in parallel.
-2. If an adapter throws, logs the error and continues with the rest.
-3. Concatenates, dedupes by `imageUrl`, sorts by `date` desc, caps at 500.
+1. Calls the APOD adapter.
+2. If it throws, logs the error.
+3. Dedupes by `imageUrl`, sorts by `date` desc, caps at 500.
 4. If the result has fewer than 50 entries → exits non-zero (build fails loudly).
 5. If `--keep-on-empty` is passed and the result is empty/below threshold, retains the existing `data/images.json`.
 6. Writes `data/images.json`.
 
-**Source endpoints:**
+**Source endpoint:**
 
-- **APOD** — `https://api.nasa.gov/planetary/apod?api_key=$NASA_API_KEY&start_date=…&end_date=…`. Page backwards from today in ~100-day windows until ~250 image entries collected (skipping videos).
-- **ESA/Hubble** — RSS feed at `https://esahubble.org/images/feed/`. Take the latest ~150 image releases.
-- **ESA/Webb** — `https://esawebb.org/images/feed/`. Same shape as Hubble. Take the latest ~150.
+- **APOD** — `https://api.nasa.gov/planetary/apod?api_key=$NASA_API_KEY&start_date=…&end_date=…`. Page backwards from today in ~100-day windows until ~500 image entries collected (skipping videos).
 
-Adapters live in `ingest/sources/`. Each exports a single `fetch(): Promise<Image[]>` function returning normalized entries.
+The adapter lives in `ingest/sources/apod.ts` and exports a single `fetchApod(opts): Promise<Image[]>` function returning normalized entries.
 
 ## Error handling
 
 | Scenario | Behavior |
 |---|---|
-| One ingest adapter fails | Log it; continue with the others. |
+| The APOD adapter fails | Log it; the merged result will be empty, falling through to the threshold check. |
 | Merged ingest result < 50 entries | Build fails with non-zero exit. |
 | `images.json` fails to load in browser | Show 9px corner message "Loading the cosmos…"; retry once after 2s. |
 | Image `<img>` fires `error` | Remove entry from in-memory list, log, advance to next. |
@@ -245,7 +241,7 @@ When `@media (prefers-reduced-motion: reduce)` matches: cross-fade is replaced w
 
 ## Testing
 
-- **Adapter unit tests** — one per source, fed a saved fixture of a real response, asserting normalized output matches expected shape.
+- **APOD adapter unit test** — fed a saved fixture of a real response, asserting normalized output matches expected shape.
 - **`normalize.ts` golden test** — covers HTML stripping, dedupe by URL, sort order, 500 cap, video filtering.
 - **Playwright smoke test on the built site:**
   - Page loads

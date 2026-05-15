@@ -20,9 +20,9 @@ export NASA_API_KEY=your_key_here   # https://api.nasa.gov
 npm run fetch
 ```
 
-This pulls from APOD, ESA/Hubble, ESA/Webb, normalizes, dedupes, sorts by date
-descending, and writes the newest 500 entries to `data/images.json`. Image
-binaries stay on the source CDNs — only metadata is stored.
+This pulls from NASA APOD, normalizes, dedupes, sorts by date descending,
+and writes the newest 500 entries to `data/images.json`. Image binaries
+stay on NASA's CDN — only metadata is stored.
 
 ## Tests
 

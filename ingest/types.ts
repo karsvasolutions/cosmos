@@ -1,7 +1,7 @@
-export type ImageSource = 'apod' | 'hubble' | 'webb';
+export type ImageSource = 'apod';
 
 export type Image = {
-  /** Stable id, e.g. "apod-2026-04-22" or "hubble-heic2401a" */
+  /** Stable id, e.g. "apod-2026-04-22" */
   id: string;
   source: ImageSource;
   /** Plain text title */
