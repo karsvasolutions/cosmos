@@ -15,10 +15,26 @@ const parser = new XMLParser({
   ignoreAttributes: false,
   cdataPropName: '__cdata',
   trimValues: true,
+  // Disable fast-xml-parser's built-in entity expansion so the billion-laughs
+  // guard (default limit: 1000) doesn't fire on ESA feeds that legitimately
+  // contain 1000+ &amp; / &lt; etc. references.  Entity decoding is handled
+  // downstream by decodeEntities() in normalize.ts (called from extractCredit,
+  // cleanDescription, and the title field assignment above).
+  processEntities: false,
 });
 
 const CREDIT_RE = /credit[:\s]*([^<\n\r]+?)(?:<|$)/i;
 const IMG_TAG_RE = /<img[^>]+src=["']([^"']+\.(?:jpe?g|png))["']/i;
+
+// ESA's live feeds don't include a per-image credit in the RSS; the credit
+// lives only on the per-image page. Use a sensible default per source so we
+// don't drop every entry. The fixture-based tests (which DO include credit
+// text in the description) still get the more specific extracted credit.
+const DEFAULT_CREDIT: Record<ImageSource, string> = {
+  apod: 'NASA',
+  hubble: 'NASA, ESA',
+  webb: 'NASA, ESA, CSA',
+};
 
 export function parseEsaRss(xml: string, source: ImageSource): Image[] {
   const doc = parser.parse(xml);
@@ -30,8 +46,13 @@ export function parseEsaRss(xml: string, source: ImageSource): Image[] {
   const out: Image[] = [];
 
   for (const raw of rawItems as RssItem[]) {
-    const description = unwrapCdata(raw.description ?? '');
-    const credit = extractCredit(description);
+    const rawDescription = unwrapCdata(raw.description ?? '');
+    // Real ESA feeds entity-encode HTML in <description> (e.g. &lt;p&gt;) rather
+    // than CDATA-wrapping it; with processEntities:false the parser leaves
+    // those literal. Decode once so the regex extractors see real HTML tags.
+    const description = decodeEntities(rawDescription);
+
+    const credit = extractCredit(description) ?? DEFAULT_CREDIT[source];
     if (!credit) continue;
 
     const imageUrl = extractImageUrl(raw.enclosure, description);
