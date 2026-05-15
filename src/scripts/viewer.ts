@@ -6,9 +6,24 @@ type State = {
   cursor: number;      // position in order
   history: number[];   // order[] indices the user has visited (for back)
   activeSlot: 'a' | 'b';
+
+  // Slideshow
+  isPlaying: boolean;
+  slideshowTimer: number | null;
+  /** True if slideshow was playing before the info sheet opened. */
+  pausedBySheet: boolean;
+
+  // Controls visibility
+  controlsVisible: boolean;
+  hideControlsTimer: number | null;
 };
 
 const READY_DELAY = 2000;
+const SLIDESHOW_INTERVAL_MS = 12_000;
+const HIDE_CONTROLS_AFTER_MS = 3_000;
+
+const GLYPH_PLAY = '▶';
+const GLYPH_PAUSE = '❚❚';
 
 export function mountViewer() {
   const root = document.getElementById('viewer');
@@ -34,6 +49,13 @@ export function mountViewer() {
     cursor: 0,
     history: [],
     activeSlot: 'a',
+
+    isPlaying: false,
+    slideshowTimer: null,
+    pausedBySheet: false,
+
+    controlsVisible: false,
+    hideControlsTimer: null,
   };
 
   render(root, state);
@@ -143,6 +165,10 @@ function swap(root: HTMLElement, state: State, img: Image) {
     );
 
     preloadNext(state);
+
+    // Reschedule the slideshow timer whenever the displayed image changes —
+    // covers both auto-advance ticks and manual prev/next.
+    if (state.isPlaying) scheduleNextTick(root, state);
   };
 
   newEl.src = img.imageUrl;
@@ -168,17 +194,125 @@ function showLoadingFailure(root: HTMLElement) {
   root.appendChild(note);
 }
 
+/* ---------- Slideshow ---------- */
+
+function clearSlideshowTimer(state: State) {
+  if (state.slideshowTimer !== null) {
+    window.clearTimeout(state.slideshowTimer);
+    state.slideshowTimer = null;
+  }
+}
+
+function scheduleNextTick(root: HTMLElement, state: State) {
+  clearSlideshowTimer(state);
+  state.slideshowTimer = window.setTimeout(() => {
+    state.slideshowTimer = null;
+    if (state.isPlaying) advance(root, state);
+  }, SLIDESHOW_INTERVAL_MS);
+}
+
+function play(root: HTMLElement, state: State) {
+  if (state.isPlaying) return;
+  state.isPlaying = true;
+  updatePlayButton(state);
+  scheduleNextTick(root, state);
+}
+
+function pause(state: State) {
+  if (!state.isPlaying) return;
+  state.isPlaying = false;
+  clearSlideshowTimer(state);
+  updatePlayButton(state);
+}
+
+function togglePlay(root: HTMLElement, state: State) {
+  if (state.isPlaying) pause(state);
+  else play(root, state);
+}
+
+function updatePlayButton(state: State) {
+  const btn = document.getElementById('ctrl-play') as HTMLButtonElement | null;
+  const glyph = document.getElementById('ctrl-play-glyph');
+  if (!btn || !glyph) return;
+  if (state.isPlaying) {
+    btn.setAttribute('aria-label', 'Pause slideshow');
+    btn.classList.add('is-playing');
+    glyph.textContent = GLYPH_PAUSE;
+  } else {
+    btn.setAttribute('aria-label', 'Play slideshow');
+    btn.classList.remove('is-playing');
+    glyph.textContent = GLYPH_PLAY;
+  }
+}
+
+/* ---------- Controls visibility ---------- */
+
+function showControls(state: State) {
+  const controls = document.getElementById('controls');
+  if (!controls) return;
+  if (!state.controlsVisible) {
+    controls.classList.add('is-visible');
+    controls.setAttribute('aria-hidden', 'false');
+    state.controlsVisible = true;
+  }
+  resetHideTimer(state);
+}
+
+function hideControls(state: State) {
+  const controls = document.getElementById('controls');
+  if (!controls) return;
+  controls.classList.remove('is-visible');
+  controls.setAttribute('aria-hidden', 'true');
+  state.controlsVisible = false;
+  if (state.hideControlsTimer !== null) {
+    window.clearTimeout(state.hideControlsTimer);
+    state.hideControlsTimer = null;
+  }
+}
+
+function resetHideTimer(state: State) {
+  if (state.hideControlsTimer !== null) {
+    window.clearTimeout(state.hideControlsTimer);
+  }
+  state.hideControlsTimer = window.setTimeout(() => {
+    hideControls(state);
+  }, HIDE_CONTROLS_AFTER_MS);
+}
+
+/* ---------- Input wiring ---------- */
+
 function attachInputs(root: HTMLElement, state: State) {
   const cue = root.querySelector<HTMLButtonElement>('#read-cue')!;
+  const prevBtn = root.querySelector<HTMLButtonElement>('#ctrl-prev')!;
+  const nextBtn = root.querySelector<HTMLButtonElement>('#ctrl-next')!;
+  const playBtn = root.querySelector<HTMLButtonElement>('#ctrl-play')!;
 
   cue.addEventListener('click', (e) => {
     e.stopPropagation();
     window.dispatchEvent(new CustomEvent('info:open'));
   });
 
-  // Click on canvas (not the cue) advances — unless sheet is open.
+  prevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    back(root, state);
+    showControls(state);
+  });
+  nextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    advance(root, state);
+    showControls(state);
+  });
+  playBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePlay(root, state);
+    showControls(state);
+  });
+
+  // Click on canvas (not a control / cue) advances — unless sheet is open.
   root.addEventListener('click', (e) => {
-    if ((e.target as HTMLElement).closest('#read-cue')) return;
+    const target = e.target as HTMLElement;
+    if (target.closest('#read-cue')) return;
+    if (target.closest('#controls')) return;
     if (document.body.classList.contains('sheet-open')) {
       window.dispatchEvent(new CustomEvent('info:close'));
       return;
@@ -186,8 +320,14 @@ function attachInputs(root: HTMLElement, state: State) {
     advance(root, state);
   });
 
+  // Reveal controls on mouse-move (desktop).
+  root.addEventListener('mousemove', () => {
+    showControls(state);
+  });
+
   window.addEventListener('keydown', (e) => {
     if (e.target instanceof HTMLAnchorElement) return;
+    showControls(state);
     switch (e.key) {
       case 'ArrowDown':
       case ' ':
@@ -204,20 +344,51 @@ function attachInputs(root: HTMLElement, state: State) {
         e.preventDefault();
         window.dispatchEvent(new CustomEvent('info:open'));
         break;
+      case 'p':
+      case 'P':
+        e.preventDefault();
+        togglePlay(root, state);
+        break;
       case 'Escape':
         window.dispatchEvent(new CustomEvent('info:close'));
         break;
     }
   });
 
-  // Touch: downward swipe advances.
+  // Touch: tap reveals controls; swipe advances/goes back.
   let startY = 0;
-  root.addEventListener('touchstart', (e) => {
-    startY = e.touches[0]!.clientY;
-  }, { passive: true });
+  let startX = 0;
+  root.addEventListener(
+    'touchstart',
+    (e) => {
+      startY = e.touches[0]!.clientY;
+      startX = e.touches[0]!.clientX;
+      showControls(state);
+    },
+    { passive: true },
+  );
   root.addEventListener('touchend', (e) => {
     const dy = e.changedTouches[0]!.clientY - startY;
-    if (dy < -40) advance(root, state);   // swipe up = next
-    if (dy > 40 && state.history.length > 0) back(root, state);
+    const dx = e.changedTouches[0]!.clientX - startX;
+    // Only treat as swipe if vertical movement dominates and exceeds threshold.
+    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 40) {
+      if (dy < 0) advance(root, state);
+      else if (state.history.length > 0) back(root, state);
+    }
+  });
+
+  // Coordinate with the info sheet: pause while open, resume on close
+  // if we were playing before.
+  window.addEventListener('info:open', () => {
+    if (state.isPlaying) {
+      state.pausedBySheet = true;
+      pause(state);
+    }
+  });
+  window.addEventListener('info:close', () => {
+    if (state.pausedBySheet) {
+      state.pausedBySheet = false;
+      play(root, state);
+    }
   });
 }
