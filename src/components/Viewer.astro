@@ -1,0 +1,65 @@
+---
+import images from '../../data/images.json';
+---
+<div id="viewer" class="viewer">
+  <img class="slide slide-a is-active" alt="" decoding="async" />
+  <img class="slide slide-b" alt="" decoding="async" />
+
+  <div class="chrome chrome-credit" aria-hidden="true">
+    <span id="credit-text"></span>
+  </div>
+
+  <button id="read-cue" class="chrome chrome-cue" type="button"
+          aria-haspopup="dialog" aria-controls="info-sheet">
+    ↑ read
+  </button>
+</div>
+
+<script id="images-data" type="application/json" set:html={JSON.stringify(images)} />
+
+<script>
+  import { mountViewer } from '../scripts/viewer';
+  mountViewer();
+</script>
+
+<style>
+  .viewer {
+    position: fixed;
+    inset: 0;
+    background: var(--canvas);
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    object-position: center;
+    opacity: 0;
+    transition: opacity var(--motion-fade) ease-in-out;
+  }
+  .slide.is-active { opacity: 1; }
+
+  .chrome {
+    position: absolute;
+    bottom: 18px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    user-select: none;
+    transition: opacity var(--motion-cue) ease;
+  }
+  .chrome-credit { left: 24px; }
+  .chrome-cue {
+    left: 50%; transform: translateX(-50%);
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .chrome-cue:hover, .chrome-cue:focus-visible { color: var(--text-secondary); }
+
+  @media (max-width: 480px) {
+    .chrome-credit { left: 16px; max-width: calc(100vw - 32px); }
+  }
+</style>

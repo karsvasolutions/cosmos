@@ -1,13 +1,22 @@
 ---
+import '../styles/globals.css';
+import Viewer from '../components/Viewer.astro';
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
     <title>Cosmos</title>
+    <meta name="description" content="High-resolution images from space." />
   </head>
-  <body style="background:#000;color:#777;font-family:system-ui;padding:2rem">
-    <p>Cosmos — scaffolding ok.</p>
+  <body>
+    <h1 class="sr-only">Cosmos — high-resolution images from space</h1>
+    <p class="sr-only" id="kbd-help">
+      Press down arrow or space to advance, up arrow to go back,
+      i to open the description, escape to close.
+    </p>
+    <Viewer />
   </body>
 </html>
