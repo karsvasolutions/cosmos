@@ -42,9 +42,9 @@ While the sidebar is open, clicking anywhere on the image canvas (outside the si
 
 **Slideshow.** Off by default — the user controls pacing. Six controls reveal on input (mouse-move, keypress, or tap) and auto-fade after 3 seconds of inactivity. They sit together in a single row at the bottom-center of the viewport (fixed — they do not shift when the sidebar pushes the canvas), ordered:
 
-`[ i  Info ]   [ ‹ Prev ]   [ ▶/❚❚ Play ]   [ › Next ]   [ 12s  Speed ]   [ ⛶  Fullscreen ]`
+`[ i  Info ]   [ ‹ Prev ]   [ ▶/❚❚ Play ]   [ 12s  Speed ]   [ › Next ]   [ ⛶  Fullscreen ]`
 
-with small extra gaps separating the info button and the view-mode group (speed + fullscreen) from the media-control trio so the play/pause button reads as the center of the cluster.
+The Speed button sits immediately to the right of Play (with the regular 12 px gap), since it controls Play's pacing. Small extra 4 px gaps separate the info button on the left and the fullscreen button on the right from the central media controls.
 
 When playing, the viewer auto-advances at the chosen interval. Clicking the **Speed** button cycles through `12s → 24s → 48s → 96s` and wraps; the button's label always shows the current setting. Changing the speed while playing restarts the timer with the new value so it applies immediately. Any manual input (click, `→`, `←`, swipe, ‹, ›) also resets the timer but does NOT pause the slideshow. The setting is per-session (not persisted). Default: 12 s. Keyboard shortcuts: `→` next, `←` prev, `Space` or `p` toggles play/pause, `i` toggles the info sidebar, `f` toggles fullscreen, `esc` closes the sidebar (and exits fullscreen via the browser's built-in behavior).
 

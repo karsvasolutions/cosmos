@@ -33,12 +33,12 @@ import images from '../../data/images.json';
         <rect x="14" y="4" width="4" height="16" rx="1"/>
       </svg>
     </button>
-    <button id="ctrl-next" class="ctrl ctrl-center ctrl-next" type="button" aria-label="Next image">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-    </button>
     <button id="ctrl-speed" class="ctrl ctrl-center ctrl-speed" type="button"
             aria-label="Slide interval: 12 seconds. Click to change.">
       <span id="ctrl-speed-label">12s</span>
+    </button>
+    <button id="ctrl-next" class="ctrl ctrl-center ctrl-next" type="button" aria-label="Next image">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
     </button>
     <button id="ctrl-fullscreen" class="ctrl ctrl-center ctrl-fullscreen" type="button" aria-label="Enter fullscreen">
       <svg class="icon icon-maximize" viewBox="0 0 24 24" aria-hidden="true">
@@ -185,10 +185,10 @@ import images from '../../data/images.json';
   .ctrl-fullscreen {
     color: var(--text-primary);
   }
-  /* Small extra breathing room between the info button and the media trio */
+  /* Small extra breathing room separating the info button on the left
+     and the fullscreen button on the right from the media controls. */
   .ctrl-info { margin-right: 4px; }
-  /* And a matching gap between the media trio and the view-mode group */
-  .ctrl-speed { margin-left: 4px; }
+  .ctrl-fullscreen { margin-left: 4px; }
 
   /* Speed button is text, not an icon */
   .ctrl-speed {
