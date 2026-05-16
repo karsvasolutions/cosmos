@@ -170,7 +170,7 @@ import images from '../../data/images.json';
   .ctrl-row {
     position: absolute;
     left: 50%;
-    bottom: 24px;
+    bottom: 60px;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
@@ -208,12 +208,6 @@ import images from '../../data/images.json';
   .ctrl-fullscreen .icon-minimize { display: none; }
   .ctrl-fullscreen.is-fullscreen .icon-maximize { display: none; }
   .ctrl-fullscreen.is-fullscreen .icon-minimize { display: block; }
-
-  /* Mobile + medium (≤ 1024px): lift the control cluster off the
-     bottom edge so it doesn't crowd the credit chrome below it. */
-  @media (max-width: 1024px) {
-    .ctrl-row { bottom: 50px; }
-  }
 
   /* Mobile only (≤ 480px): smaller buttons + tighter gap. */
   @media (max-width: 480px) {
