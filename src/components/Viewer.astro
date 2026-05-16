@@ -36,6 +36,20 @@ import images from '../../data/images.json';
     <button id="ctrl-next" class="ctrl ctrl-center ctrl-next" type="button" aria-label="Next image">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
     </button>
+    <button id="ctrl-fullscreen" class="ctrl ctrl-center ctrl-fullscreen" type="button" aria-label="Enter fullscreen">
+      <svg class="icon icon-maximize" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+        <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+        <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+        <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+      </svg>
+      <svg class="icon icon-minimize" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
+        <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
+        <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
+        <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+      </svg>
+    </button>
   </div>
 </div>
 
@@ -154,16 +168,24 @@ import images from '../../data/images.json';
   /* Visual hierarchy: info quiet on the left edge, media controls bright */
   .ctrl-prev,
   .ctrl-play,
-  .ctrl-next {
+  .ctrl-next,
+  .ctrl-fullscreen {
     color: var(--text-primary);
   }
   /* Small extra breathing room between the info button and the media trio */
   .ctrl-info { margin-right: 4px; }
+  /* And a matching gap between the media trio and the fullscreen toggle */
+  .ctrl-fullscreen { margin-left: 4px; }
 
   /* Play/pause toggle: show the right glyph based on state */
   .ctrl-play .icon-pause { display: none; }
   .ctrl-play.is-playing .icon-play { display: none; }
   .ctrl-play.is-playing .icon-pause { display: block; }
+
+  /* Fullscreen toggle: enter / exit glyphs */
+  .ctrl-fullscreen .icon-minimize { display: none; }
+  .ctrl-fullscreen.is-fullscreen .icon-maximize { display: none; }
+  .ctrl-fullscreen.is-fullscreen .icon-minimize { display: block; }
 
   @media (max-width: 480px) {
     .chrome-credit { left: 16px; max-width: calc(100vw - 32px); }

@@ -246,6 +246,43 @@ function updatePlayButton(state: State) {
   }
 }
 
+/* ---------- Fullscreen ---------- */
+
+function toggleFullscreen() {
+  const doc = document as Document & {
+    webkitExitFullscreen?: () => Promise<void>;
+    webkitFullscreenElement?: Element | null;
+  };
+  const root = document.documentElement as HTMLElement & {
+    webkitRequestFullscreen?: () => Promise<void>;
+  };
+
+  const isOn = !!(document.fullscreenElement ?? doc.webkitFullscreenElement);
+  const enter = root.requestFullscreen?.bind(root) ?? root.webkitRequestFullscreen?.bind(root);
+  const exit = document.exitFullscreen?.bind(document) ?? doc.webkitExitFullscreen?.bind(document);
+
+  try {
+    if (isOn) exit?.();
+    else enter?.();
+  } catch (err) {
+    console.warn('Fullscreen toggle failed:', err);
+  }
+}
+
+function syncFullscreenButton() {
+  const btn = document.getElementById('ctrl-fullscreen');
+  if (!btn) return;
+  const doc = document as Document & { webkitFullscreenElement?: Element | null };
+  const isOn = !!(document.fullscreenElement ?? doc.webkitFullscreenElement);
+  if (isOn) {
+    btn.classList.add('is-fullscreen');
+    btn.setAttribute('aria-label', 'Exit fullscreen');
+  } else {
+    btn.classList.remove('is-fullscreen');
+    btn.setAttribute('aria-label', 'Enter fullscreen');
+  }
+}
+
 /* ---------- Controls visibility ---------- */
 
 function showControls(state: State) {
@@ -289,6 +326,7 @@ function attachInputs(root: HTMLElement, state: State) {
   const nextBtn = document.getElementById('ctrl-next') as HTMLButtonElement;
   const infoBtn = document.getElementById('ctrl-info') as HTMLButtonElement;
   const playBtn = document.getElementById('ctrl-play') as HTMLButtonElement;
+  const fullscreenBtn = document.getElementById('ctrl-fullscreen') as HTMLButtonElement;
 
   prevBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -312,6 +350,17 @@ function attachInputs(root: HTMLElement, state: State) {
     togglePlay(root, state);
     showControls(state);
   });
+  fullscreenBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleFullscreen();
+    showControls(state);
+    (e.currentTarget as HTMLElement).blur();
+  });
+
+  // Keep the fullscreen button's icon + aria-label in sync with the
+  // actual state (also covers user pressing Esc to exit fullscreen).
+  document.addEventListener('fullscreenchange', syncFullscreenButton);
+  syncFullscreenButton();
 
   // Click on canvas (not a control) advances. With the sidebar open the
   // image is to the right of the sidebar but still fully interactive —
@@ -352,6 +401,11 @@ function attachInputs(root: HTMLElement, state: State) {
       case 'I':
         e.preventDefault();
         window.dispatchEvent(new CustomEvent('info:toggle'));
+        break;
+      case 'f':
+      case 'F':
+        e.preventDefault();
+        toggleFullscreen();
         break;
       case 'Escape':
         window.dispatchEvent(new CustomEvent('info:close'));

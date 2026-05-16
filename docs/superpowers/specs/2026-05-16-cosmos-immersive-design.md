@@ -40,13 +40,13 @@ The sidebar contains:
 
 The image canvas remains fully interactive while the sidebar is open: clicking it still advances to the next image, and the sidebar's content updates to match. `esc` closes the sidebar. The transition (sidebar slide + canvas push) animates over ~280ms with `ease-out`; under `prefers-reduced-motion` it collapses to an instant swap.
 
-**Slideshow.** Off by default — the user controls pacing. Four controls reveal on input (mouse-move, keypress, or tap) and auto-fade after 3 seconds of inactivity. All four sit together in a single row at the bottom-center of the canvas, ordered:
+**Slideshow.** Off by default — the user controls pacing. Five controls reveal on input (mouse-move, keypress, or tap) and auto-fade after 3 seconds of inactivity. All five sit together in a single row at the bottom-center of the viewport (fixed — they do not shift when the sidebar pushes the canvas), ordered:
 
-`[ i  Info ]   [ ‹ Prev ]   [ ▶/❚❚ Play ]   [ › Next ]`
+`[ i  Info ]   [ ‹ Prev ]   [ ▶/❚❚ Play ]   [ › Next ]   [ ⛶  Fullscreen ]`
 
-with a small extra gap between the info button and the media-control trio so the play/pause button reads as the center of the cluster.
+with small extra gaps separating the info button and the fullscreen button from the media-control trio so the play/pause button reads as the center of the cluster.
 
-When playing, the viewer auto-advances every 12 seconds. Any manual input (click, `→`, `←`, swipe, ‹, ›) resets the 12-second timer but does NOT pause the slideshow. Pressing the Play/Pause button toggles state. Keyboard shortcuts: `→` next, `←` prev, `Space` or `p` toggles play/pause, `i` toggles the info sidebar.
+When playing, the viewer auto-advances every 12 seconds. Any manual input (click, `→`, `←`, swipe, ‹, ›) resets the 12-second timer but does NOT pause the slideshow. Pressing the Play/Pause button toggles state. Keyboard shortcuts: `→` next, `←` prev, `Space` or `p` toggles play/pause, `i` toggles the info sidebar, `f` toggles fullscreen, `esc` closes the sidebar (and exits fullscreen via the browser's built-in behavior).
 
 Controls are styled to match the rest of the chrome — translucent disc with `backdrop-filter: blur(8px)`, `var(--hairline)` border, white glyph on the active button. They never overlap the credit label or info sheet. When the info sheet is open the slideshow pauses automatically and resumes when the sheet is closed (if it was playing before).
 
@@ -237,9 +237,9 @@ When `@media (prefers-reduced-motion: reduce)` matches: cross-fade is replaced w
 - An off-screen `<h1 class="sr-only">` reads "Cosmos — high-resolution images from space" for SEO and screen readers.
 - Each `<img>` has `alt={title}` (the image title, e.g. "Cosmic Cliffs in the Carina Nebula").
 - The info-sheet source link has a visible `:focus-visible` ring (`outline: 2px solid var(--focus-ring); outline-offset: 2px`). All other interactive surfaces (the image / read cue) also expose `:focus-visible`.
-- Tab order: prev → info → play → next → (when sheet open) source link → close button. `esc` exits the sheet from anywhere.
+- Tab order: info → prev → play → next → fullscreen → (when sidebar open) source link. `esc` exits the sidebar from anywhere.
 - The info sidebar is implemented as a semantic `<aside aria-label="Image description">` with `aria-hidden` toggled in sync with `body.sidebar-open`. It is not modal — the image canvas alongside it stays fully interactive.
-- Keyboard shortcuts are documented in a hidden help string read on first load by screen readers: "Press right arrow to advance, left arrow to go back, space or p to play or pause the slideshow, i to toggle info, escape to close info."
+- Keyboard shortcuts are documented in a hidden help string read on first load by screen readers: "Press right arrow to advance, left arrow to go back, space or p to play or pause the slideshow, i to toggle info, f to toggle fullscreen, escape to close info."
 - Respects `prefers-reduced-motion` as described above.
 
 ## Testing
