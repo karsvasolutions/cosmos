@@ -294,6 +294,8 @@ function attachInputs(root: HTMLElement, state: State) {
     e.stopPropagation();
     window.dispatchEvent(new CustomEvent('info:toggle'));
     showControls(state);
+    // Drop focus so the button doesn't keep a focus ring after click.
+    (e.currentTarget as HTMLElement).blur();
   });
   playBtn.addEventListener('click', (e) => {
     e.stopPropagation();

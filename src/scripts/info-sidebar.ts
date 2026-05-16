@@ -30,10 +30,6 @@ export function mountInfoSidebar() {
   function close() {
     document.body.classList.remove('sidebar-open');
     sidebar.setAttribute('aria-hidden', 'true');
-    // Restore focus to the info button when closing via keyboard, so the
-    // user's place isn't lost.
-    const infoBtn = document.getElementById('ctrl-info');
-    if (infoBtn) (infoBtn as HTMLElement).focus({ preventScroll: true });
   }
 
   function toggle() {
