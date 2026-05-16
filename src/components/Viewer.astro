@@ -210,7 +210,15 @@ import images from '../../data/images.json';
   .ctrl-fullscreen.is-fullscreen .icon-minimize { display: block; }
 
   @media (max-width: 480px) {
-    .chrome-credit { left: 16px; max-width: calc(100vw - 32px); }
+    /* Lift the credit above the control cluster so long titles don't
+       run under the buttons. Cluster on mobile: 40px tall buttons at
+       bottom: 20px → top edge at 60px from the viewport bottom. The
+       credit sits 10px above that. */
+    .chrome-credit {
+      left: 16px;
+      bottom: 70px;
+      max-width: calc(100vw - 32px);
+    }
     .ctrl { width: 40px; height: 40px; }
     .icon { width: 16px; height: 16px; }
     .icon-play { width: 14px; height: 14px; }
