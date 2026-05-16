@@ -17,8 +17,10 @@
   </header>
 
   <div class="sidebar-scroll">
-    <p id="sidebar-body" class="sidebar-body"></p>
-    <p id="sidebar-credit" class="sidebar-credit"></p>
+    <div class="sidebar-scroll-inner">
+      <p id="sidebar-body" class="sidebar-body"></p>
+      <p id="sidebar-credit" class="sidebar-credit"></p>
+    </div>
   </div>
 </aside>
 
@@ -60,6 +62,23 @@
     min-height: 0;  /* required for flex children to allow shrinking */
     overflow-y: auto;
     max-width: 52ch;
+
+    /* Make the scroll area itself a flex column so the inner block
+       can use auto margins to vertically center when it fits. */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Desktop: vertically center the description block when it fits.
+     Auto margins collapse to 0 when content overflows, restoring
+     natural top-aligned scroll from the top. On mobile / tablet keep
+     top-alignment so the description reads predictably from the top
+     of the panel. */
+  @media (min-width: 1025px) {
+    .sidebar-scroll-inner {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
   }
 
   /* Close × — always visible, always a bare cross (no disc). */
