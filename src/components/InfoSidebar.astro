@@ -93,6 +93,23 @@
     .sidebar-close { display: flex; }
   }
 
+  /* Mobile: subtler treatment — strip the disc, just the cross. */
+  @media (max-width: 767px) {
+    .sidebar-close {
+      width: auto;
+      height: auto;
+      padding: 8px;
+      background: transparent;
+      border: 0;
+      color: var(--text-muted);
+    }
+    .sidebar-close:hover,
+    .sidebar-close:focus-visible {
+      background: transparent;
+      color: var(--text-primary);
+    }
+  }
+
   .sidebar-title {
     margin: 0 0 14px;
     font-family: var(--font-serif);
