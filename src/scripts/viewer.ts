@@ -69,6 +69,11 @@ export function mountViewer() {
   attachInputs(root, state);
 
   publishCurrentImage(currentImage(state));
+
+  // Start the slideshow by default — the immersive experience is meant
+  // to play on arrival. User can pause via the play button, the `p` key,
+  // or Space.
+  play(root, state);
 }
 
 function publishCurrentImage(img: Image) {

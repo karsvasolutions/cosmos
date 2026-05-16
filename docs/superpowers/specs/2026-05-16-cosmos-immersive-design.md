@@ -40,7 +40,7 @@ The sidebar contains:
 
 While the sidebar is open, clicking anywhere on the image canvas (outside the sidebar and the control cluster) closes the sidebar — a click-outside-to-dismiss gesture. To advance to the next image while the sidebar is open, use the next button, `→`, or — on touch devices, a horizontal swipe. `esc` also closes the sidebar. The transition (sidebar slide + canvas push) animates over ~280ms with `ease-out`; under `prefers-reduced-motion` it collapses to an instant swap.
 
-**Slideshow.** Off by default — the user controls pacing. Six controls reveal on input (mouse-move, keypress, or tap) and auto-fade after 3 seconds of inactivity. They sit together in a single row at the bottom-center of the viewport (fixed — they do not shift when the sidebar pushes the canvas), ordered:
+**Slideshow.** On by default — the page begins auto-advancing at the chosen interval (default: 12 s) as soon as it loads. The user can pause via the play button, the `p` key, or `Space`. Six controls reveal on input (mouse-move, keypress, or tap) and auto-fade after 3 seconds of inactivity. They sit together in a single row at the bottom-center of the viewport (fixed — they do not shift when the sidebar pushes the canvas), ordered:
 
 `[ i  Info ]   [ ‹ Prev ]   [ ▶/❚❚ Play ]   [ 12s  Speed ]   [ › Next ]   [ ⛶  Fullscreen ]`
 
