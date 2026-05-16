@@ -128,15 +128,25 @@ import images from '../../data/images.json';
     gap: 12px;
   }
   .ctrl-center { position: static; }
+  .ctrl-info,
+  .ctrl-play {
+    color: var(--text-primary);
+  }
   .ctrl-info {
-    font-family: var(--font-serif);
-    font-style: italic;
+    /* Bold sans-serif "i" reads clearly as an info indicator —
+       same visual weight as the play glyph next to it. */
+    font-family: var(--font-sans);
+    font-weight: 600;
     font-size: 18px;
     line-height: 1;
   }
+  .ctrl-info span {
+    /* slight optical nudge */
+    transform: translateY(-1px);
+    display: inline-block;
+  }
   .ctrl-play {
     font-size: 14px;
-    color: var(--text-primary);
   }
   .ctrl-play.is-playing #ctrl-play-glyph {
     letter-spacing: 0.06em;
