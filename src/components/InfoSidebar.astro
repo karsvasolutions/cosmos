@@ -6,16 +6,20 @@
       <path d="M18 6 6 18M6 6l12 12"/>
     </svg>
   </button>
-  <article class="sidebar-inner">
+
+  <header class="sidebar-header">
     <h2 id="sidebar-title" class="sidebar-title"></h2>
     <p class="sidebar-meta">
       <span id="sidebar-date"></span>
       <span class="sidebar-dot" aria-hidden="true">·</span>
       <a id="sidebar-link" target="_blank" rel="noreferrer noopener">view source</a>
     </p>
+  </header>
+
+  <div class="sidebar-scroll">
     <p id="sidebar-body" class="sidebar-body"></p>
     <p id="sidebar-credit" class="sidebar-credit"></p>
-  </article>
+  </div>
 </aside>
 
 <script>
@@ -29,56 +33,54 @@
     left: 0; top: 0; bottom: 0;
     width: var(--sidebar-width);
     box-sizing: border-box;
-    padding: 40px;
-    /* Slight lift from pure black so the panel reads as a distinct surface
-       next to the image canvas. */
+    padding: 56px 40px 40px;
     background: #0a0a0f;
     border-right: 1px solid var(--hairline);
     color: var(--text-secondary);
-    overflow-y: auto;
     z-index: 10;
     transform: translateX(-100%);
     transition: transform var(--motion-sidebar) ease-out;
     will-change: transform;
 
-    /* Vertically center the content when it fits in one screen; auto
-       margins collapse to 0 when content overflows, restoring natural
-       scroll from the top. */
+    /* Fixed header + scrollable body inside a flex column.
+       The header sticks to the top of the inner padded area; the
+       scroll body takes the remaining height. */
     display: flex;
     flex-direction: column;
   }
   :global(body.sidebar-open) .sidebar { transform: translateX(0); }
 
-  .sidebar-inner {
+  .sidebar-header {
+    flex: 0 0 auto;
     max-width: 52ch;
-    margin-top: auto;
-    margin-bottom: auto;
   }
 
-  /* Close button — only on mobile + tablet (≤ 1024px), where the
-     bottom-center info toggle is harder to reach because the sidebar
-     covers most of the viewport. */
+  .sidebar-scroll {
+    flex: 1 1 auto;
+    min-height: 0;  /* required for flex children to allow shrinking */
+    overflow-y: auto;
+    max-width: 52ch;
+  }
+
+  /* Close × — always visible, always a bare cross (no disc). */
   .sidebar-close {
     position: absolute;
     top: 16px;
     right: 16px;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(10, 10, 15, 0.65);
-    border: 1px solid var(--hairline);
-    color: var(--text-secondary);
+    padding: 8px;
+    background: transparent;
+    border: 0;
+    color: var(--text-muted);
     cursor: pointer;
-    z-index: 1;
-    transition: color var(--motion-cue) ease, background var(--motion-cue) ease;
+    z-index: 2;
+    transition: color var(--motion-cue) ease;
   }
   .sidebar-close:hover,
   .sidebar-close:focus-visible {
     color: var(--text-primary);
-    background: rgba(10, 10, 15, 0.85);
   }
   .sidebar-close svg {
     width: 16px;
@@ -88,26 +90,6 @@
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
-  }
-  @media (max-width: 1024px) {
-    .sidebar-close { display: flex; }
-  }
-
-  /* Mobile: subtler treatment — strip the disc, just the cross. */
-  @media (max-width: 767px) {
-    .sidebar-close {
-      width: auto;
-      height: auto;
-      padding: 8px;
-      background: transparent;
-      border: 0;
-      color: var(--text-muted);
-    }
-    .sidebar-close:hover,
-    .sidebar-close:focus-visible {
-      background: transparent;
-      color: var(--text-primary);
-    }
   }
 
   .sidebar-title {
@@ -153,29 +135,29 @@
     color: var(--text-muted);
   }
 
-  /* Tablet + mobile (≤ 1024px): reserve vertical room at the top for
-     the close button (16px from top, 36px tall = 52px) and at the
-     bottom for the control cluster (which on medium sits at
-     bottom: 48px + 44px height = 92px from viewport bottom). Generous
-     buffer so a long title or last paragraph doesn't graze the chrome. */
+  /* Tablet + mobile (≤ 1024px): reserve top room for the close button
+     (16px from top, 32px tall = 48px) and bottom room for the control
+     cluster (medium: bottom: 48px + 44px height = 92px from viewport
+     bottom). The header sits at the top of the padded area; the
+     scroll body ends at the bottom of the padded area. */
   @media (max-width: 1024px) {
-    .sidebar { padding: 80px 40px 100px; }
+    .sidebar { padding: 56px 40px 100px; }
   }
 
-  /* Mobile (≤ 767px): sidebar overlays the canvas at 88% width and the
-     cluster sits higher (bottom: 72px → top edge at 112px from bottom),
-     so bump the bottom padding accordingly. */
+  /* Mobile (≤ 767px): sidebar overlays the canvas at 88% width.
+     The control cluster is hidden when sidebar is open here, so we
+     only need the close-button top clearance — bottom can be tighter. */
   @media (max-width: 767px) {
-    .sidebar { width: 88%; padding: 80px 28px 120px; }
+    .sidebar { width: 88%; padding: 56px 28px 32px; }
     .sidebar-title { font-size: 22px; }
     .sidebar-body { font-size: 14px; line-height: 1.65; }
   }
 
-  /* Subtle scrollbar so it doesn't fight the design */
-  .sidebar { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
-  .sidebar::-webkit-scrollbar { width: 6px; }
-  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 3px; }
-  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  /* Subtle scrollbar inside the scrollable body */
+  .sidebar-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+  .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+  .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 3px; }
+  .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
 
   @media (prefers-reduced-motion: reduce) {
     .sidebar { transition: transform 0.001ms; }

@@ -11,76 +11,60 @@ test.beforeEach(async ({ page }) => {
   );
 });
 
+// Title is in the fixed header at the top of the sidebar; it must
+// clear the absolutely-positioned close × button in the top-right.
 for (const { name, width, height } of [
   { name: 'mobile 375', width: 375, height: 667 },
   { name: 'tablet 900', width: 900, height: 1200 },
+  { name: 'desktop 1440', width: 1440, height: 900 },
 ]) {
-  test(`MEASURE: content clears close button + cluster on ${name}`, async ({ page }) => {
+  test(`title clears close button at top on ${name}`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await page.goto('/');
     await page.waitForSelector('#viewer img.is-active');
     await page.keyboard.press('i');
     await expect(page.locator('body.sidebar-open')).toHaveCount(1);
-    await page.waitForTimeout(400);
-    // Force a long description so the sidebar is scrollable.
-    await page.evaluate(() => {
-      const b = document.getElementById('sidebar-body');
-      if (b) b.textContent = 'Lorem ipsum dolor sit amet. '.repeat(60);
-    });
-
-    // Scroll the sidebar to the bottom so the last element (credit) is
-    // in the visible area — that's the worst case for clearance below.
-    await page.evaluate(() => {
-      const s = document.getElementById('info-sidebar')!;
-      s.scrollTop = s.scrollHeight;
-    });
-    await page.waitForTimeout(100);
-
-    const m = await page.evaluate(() => {
-      const title = document.getElementById('sidebar-title')!.getBoundingClientRect();
-      const credit = document.getElementById('sidebar-credit')!.getBoundingClientRect();
-      const closeBtn = document.getElementById('sidebar-close')!.getBoundingClientRect();
-      const cluster = document.querySelector('.ctrl-row')!.getBoundingClientRect();
-      return {
-        titleTop: title.top,
-        creditBottom: credit.bottom,
-        closeBottom: closeBtn.bottom,
-        clusterTop: cluster.top,
-        // Title is shown when scrolled to TOP, not bottom — so this
-        // value is measured against an already-scrolled-down state and
-        // expected to be off-screen. Skip the top assertion in this
-        // worst-case scroll snapshot; mobile.gapAboveTitle is meaningful
-        // only when scrolled to the top.
-        gapBelowCredit: cluster.top - credit.bottom,
-      };
-    });
-    console.log(`[${name}] MEASUREMENT:`, JSON.stringify(m, null, 2));
-
-    // When scrolled to the bottom, the credit must end above the
-    // control cluster (positive gap).
-    expect(m.gapBelowCredit).toBeGreaterThan(0);
-  });
-}
-
-// Separate top-clearance check (no scroll — title visible at top).
-for (const { name, width, height } of [
-  { name: 'mobile 375', width: 375, height: 667 },
-  { name: 'tablet 900', width: 900, height: 1200 },
-]) {
-  test(`MEASURE: title clears close button at top on ${name}`, async ({ page }) => {
-    await page.setViewportSize({ width, height });
-    await page.goto('/');
-    await page.waitForSelector('#viewer img.is-active');
-    await page.keyboard.press('i');
-    await expect(page.locator('body.sidebar-open')).toHaveCount(1);
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(300);
 
     const m = await page.evaluate(() => {
       const title = document.getElementById('sidebar-title')!.getBoundingClientRect();
       const closeBtn = document.getElementById('sidebar-close')!.getBoundingClientRect();
       return { titleTop: title.top, closeBottom: closeBtn.bottom, gap: title.top - closeBtn.bottom };
     });
-    console.log(`[${name}] TOP MEASUREMENT:`, JSON.stringify(m, null, 2));
     expect(m.gap).toBeGreaterThan(0);
   });
 }
+
+// The header is fixed (does not scroll); only the body+credit block
+// scrolls when the description is long. Verify that.
+test('header stays put while body scrolls (long description)', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto('/');
+  await page.waitForSelector('#viewer img.is-active');
+  await page.keyboard.press('i');
+  await expect(page.locator('body.sidebar-open')).toHaveCount(1);
+  await page.waitForTimeout(300);
+
+  await page.evaluate(() => {
+    const b = document.getElementById('sidebar-body');
+    if (b) b.textContent = 'Lorem ipsum dolor sit amet. '.repeat(80);
+  });
+
+  const before = await page.locator('#sidebar-title').evaluate(
+    (el) => el.getBoundingClientRect().top,
+  );
+
+  // Scroll the body region.
+  await page.evaluate(() => {
+    const s = document.querySelector('.sidebar-scroll') as HTMLElement;
+    s.scrollTop = s.scrollHeight;
+  });
+  await page.waitForTimeout(100);
+
+  const after = await page.locator('#sidebar-title').evaluate(
+    (el) => el.getBoundingClientRect().top,
+  );
+
+  // Title should not have moved at all.
+  expect(after).toBe(before);
+});

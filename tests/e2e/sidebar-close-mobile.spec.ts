@@ -24,12 +24,15 @@ test('mobile: close button is visible and dismisses the sidebar', async ({ page 
   await expect(page.locator('body.sidebar-open')).toHaveCount(0);
 });
 
-test('desktop: close button is hidden', async ({ page }) => {
+test('desktop: close button is also visible and dismisses the sidebar', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.waitForSelector('#viewer img.is-active');
   await page.keyboard.press('i');
   await expect(page.locator('body.sidebar-open')).toHaveCount(1);
 
-  await expect(page.locator('#sidebar-close')).toBeHidden();
+  const closeBtn = page.locator('#sidebar-close');
+  await expect(closeBtn).toBeVisible();
+  await closeBtn.click();
+  await expect(page.locator('body.sidebar-open')).toHaveCount(0);
 });
