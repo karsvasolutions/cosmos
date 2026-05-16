@@ -26,8 +26,8 @@ test('viewer renders an image and responds to inputs', async ({ page }) => {
   const firstSrc = await active.getAttribute('src');
   expect(firstSrc).toBeTruthy();
 
-  // Press ArrowDown -> swap (with only 2 example entries, the swap goes to the other)
-  await page.keyboard.press('ArrowDown');
+  // Press ArrowRight -> swap (with only 2 example entries, the swap goes to the other)
+  await page.keyboard.press('ArrowRight');
   // Wait briefly for cross-fade
   await page.waitForTimeout(600);
 

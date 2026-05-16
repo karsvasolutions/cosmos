@@ -10,21 +10,18 @@ import images from '../../data/images.json';
   </div>
 
   <div id="controls" class="controls" aria-hidden="true">
-    <button id="ctrl-prev" class="ctrl ctrl-side ctrl-prev" type="button" aria-label="Previous image">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-    </button>
-    <button id="ctrl-next" class="ctrl ctrl-side ctrl-next" type="button" aria-label="Next image">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-    </button>
     <div class="ctrl-row">
       <button id="ctrl-info" class="ctrl ctrl-center ctrl-info" type="button"
               aria-label="Show image description"
-              aria-haspopup="dialog" aria-controls="info-sheet">
+              aria-haspopup="dialog" aria-controls="info-sidebar">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="10"/>
           <path d="M12 16v-4"/>
           <path d="M12 8h.01"/>
         </svg>
+      </button>
+      <button id="ctrl-prev" class="ctrl ctrl-center ctrl-prev" type="button" aria-label="Previous image">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
       </button>
       <button id="ctrl-play" class="ctrl ctrl-center ctrl-play" type="button" aria-label="Play slideshow">
         <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
@@ -32,6 +29,9 @@ import images from '../../data/images.json';
           <rect x="6" y="4" width="4" height="16" rx="1"/>
           <rect x="14" y="4" width="4" height="16" rx="1"/>
         </svg>
+      </button>
+      <button id="ctrl-next" class="ctrl ctrl-center ctrl-next" type="button" aria-label="Next image">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
       </button>
     </div>
   </div>
@@ -133,28 +133,25 @@ import images from '../../data/images.json';
   .icon-play polygon { /* keep filled */ }
   .icon-pause { fill: currentColor; stroke: none; }
 
-  .ctrl-side {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .ctrl-side:active { transform: translateY(-50%) scale(0.96); }
-  .ctrl-prev { left: 18px; }
-  .ctrl-next { right: 18px; }
-
-  /* Centered cluster: info + play, side by side */
+  /* Centered cluster: info · prev · play · next */
   .ctrl-row {
     position: absolute;
     left: 50%;
     bottom: 24px;
     transform: translateX(-50%);
     display: flex;
+    align-items: center;
     gap: 12px;
   }
   .ctrl-center { position: static; }
-  .ctrl-info,
-  .ctrl-play {
+  /* Visual hierarchy: info quiet on the left edge, media controls bright */
+  .ctrl-prev,
+  .ctrl-play,
+  .ctrl-next {
     color: var(--text-primary);
   }
+  /* Small extra breathing room between the info button and the media trio */
+  .ctrl-info { margin-right: 4px; }
 
   /* Play/pause toggle: show the right glyph based on state */
   .ctrl-play .icon-pause { display: none; }
@@ -166,8 +163,6 @@ import images from '../../data/images.json';
     .ctrl { width: 40px; height: 40px; }
     .icon { width: 16px; height: 16px; }
     .icon-play { width: 14px; height: 14px; }
-    .ctrl-prev { left: 10px; }
-    .ctrl-next { right: 10px; }
     .ctrl-row { bottom: 20px; gap: 10px; }
   }
 </style>

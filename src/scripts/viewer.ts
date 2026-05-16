@@ -319,13 +319,13 @@ function attachInputs(root: HTMLElement, state: State) {
     if (e.target instanceof HTMLAnchorElement) return;
     showControls(state);
     switch (e.key) {
-      case 'ArrowDown':
+      case 'ArrowRight':
       case ' ':
       case 'Spacebar':
         e.preventDefault();
         advance(root, state);
         break;
-      case 'ArrowUp':
+      case 'ArrowLeft':
         e.preventDefault();
         back(root, state);
         break;
@@ -360,10 +360,10 @@ function attachInputs(root: HTMLElement, state: State) {
   root.addEventListener('touchend', (e) => {
     const dy = e.changedTouches[0]!.clientY - startY;
     const dx = e.changedTouches[0]!.clientX - startX;
-    // Only treat as swipe if vertical movement dominates and exceeds threshold.
-    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 40) {
-      if (dy < 0) advance(root, state);
-      else if (state.history.length > 0) back(root, state);
+    // Horizontal swipe navigates (matches the left/right arrow keys).
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0) advance(root, state);          // swipe left = next
+      else if (state.history.length > 0) back(root, state);  // swipe right = prev
     }
   });
 
