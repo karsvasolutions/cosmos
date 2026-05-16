@@ -11,19 +11,27 @@ import images from '../../data/images.json';
 
   <div id="controls" class="controls" aria-hidden="true">
     <button id="ctrl-prev" class="ctrl ctrl-side ctrl-prev" type="button" aria-label="Previous image">
-      <span aria-hidden="true">‹</span>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
     </button>
     <button id="ctrl-next" class="ctrl ctrl-side ctrl-next" type="button" aria-label="Next image">
-      <span aria-hidden="true">›</span>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
     </button>
     <div class="ctrl-row">
       <button id="ctrl-info" class="ctrl ctrl-center ctrl-info" type="button"
               aria-label="Show image description"
               aria-haspopup="dialog" aria-controls="info-sheet">
-        <span aria-hidden="true">i</span>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4"/>
+          <path d="M12 8h.01"/>
+        </svg>
       </button>
       <button id="ctrl-play" class="ctrl ctrl-center ctrl-play" type="button" aria-label="Play slideshow">
-        <span id="ctrl-play-glyph" aria-hidden="true">▶</span>
+        <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="6" y="4" width="4" height="16" rx="1"/>
+          <rect x="14" y="4" width="4" height="16" rx="1"/>
+        </svg>
       </button>
     </div>
   </div>
@@ -75,12 +83,8 @@ import images from '../../data/images.json';
     opacity: 0;
     transition: opacity var(--motion-cue) ease;
   }
-  .controls.is-visible {
-    opacity: 1;
-  }
-  .controls.is-visible .ctrl {
-    pointer-events: auto;
-  }
+  .controls.is-visible { opacity: 1; }
+  .controls.is-visible .ctrl { pointer-events: auto; }
 
   .ctrl {
     position: absolute;
@@ -94,8 +98,6 @@ import images from '../../data/images.json';
     backdrop-filter: blur(8px);
     border: 1px solid var(--hairline);
     color: var(--text-secondary);
-    font-size: 22px;
-    line-height: 1;
     cursor: pointer;
     transition: color var(--motion-cue) ease, background var(--motion-cue) ease, transform var(--motion-cue) ease;
   }
@@ -106,6 +108,22 @@ import images from '../../data/images.json';
   }
   .ctrl:active { transform: scale(0.96); }
 
+  /* Lucide-style line icons — single weight, rounded joins */
+  .icon {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Play and pause read better as filled silhouettes (media convention)
+     while the rest stay as line icons. */
+  .icon-play { fill: currentColor; stroke: none; width: 16px; height: 16px; }
+  .icon-play polygon { /* keep filled */ }
+  .icon-pause { fill: currentColor; stroke: none; }
+
   .ctrl-side {
     top: 50%;
     transform: translateY(-50%);
@@ -113,10 +131,6 @@ import images from '../../data/images.json';
   .ctrl-side:active { transform: translateY(-50%) scale(0.96); }
   .ctrl-prev { left: 18px; }
   .ctrl-next { right: 18px; }
-  .ctrl-prev span, .ctrl-next span {
-    /* nudge glyph to optical center */
-    transform: translateY(-1px);
-  }
 
   /* Centered cluster: info + play, side by side */
   .ctrl-row {
@@ -132,30 +146,17 @@ import images from '../../data/images.json';
   .ctrl-play {
     color: var(--text-primary);
   }
-  .ctrl-info {
-    /* Bold sans-serif "i" reads clearly as an info indicator —
-       same visual weight as the play glyph next to it. */
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 1;
-  }
-  .ctrl-info span {
-    /* slight optical nudge */
-    transform: translateY(-1px);
-    display: inline-block;
-  }
-  .ctrl-play {
-    font-size: 14px;
-  }
-  .ctrl-play.is-playing #ctrl-play-glyph {
-    letter-spacing: 0.06em;
-  }
+
+  /* Play/pause toggle: show the right glyph based on state */
+  .ctrl-play .icon-pause { display: none; }
+  .ctrl-play.is-playing .icon-play { display: none; }
+  .ctrl-play.is-playing .icon-pause { display: block; }
 
   @media (max-width: 480px) {
     .chrome-credit { left: 16px; max-width: calc(100vw - 32px); }
-    .ctrl { width: 40px; height: 40px; font-size: 20px; }
-    .ctrl-info { font-size: 16px; }
+    .ctrl { width: 40px; height: 40px; }
+    .icon { width: 16px; height: 16px; }
+    .icon-play { width: 14px; height: 14px; }
     .ctrl-prev { left: 10px; }
     .ctrl-next { right: 10px; }
     .ctrl-row { bottom: 20px; gap: 10px; }

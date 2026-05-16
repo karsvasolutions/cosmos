@@ -22,9 +22,6 @@ const READY_DELAY = 2000;
 const SLIDESHOW_INTERVAL_MS = 12_000;
 const HIDE_CONTROLS_AFTER_MS = 3_000;
 
-const GLYPH_PLAY = '▶';
-const GLYPH_PAUSE = '❚❚';
-
 export function mountViewer() {
   const root = document.getElementById('viewer');
   const dataNode = document.getElementById('images-data');
@@ -232,16 +229,15 @@ function togglePlay(root: HTMLElement, state: State) {
 
 function updatePlayButton(state: State) {
   const btn = document.getElementById('ctrl-play') as HTMLButtonElement | null;
-  const glyph = document.getElementById('ctrl-play-glyph');
-  if (!btn || !glyph) return;
+  if (!btn) return;
+  // The SVG glyph swap is CSS-driven: .ctrl-play.is-playing toggles between
+  // the .icon-play and .icon-pause children. JS only owns aria-label + class.
   if (state.isPlaying) {
     btn.setAttribute('aria-label', 'Pause slideshow');
     btn.classList.add('is-playing');
-    glyph.textContent = GLYPH_PAUSE;
   } else {
     btn.setAttribute('aria-label', 'Play slideshow');
     btn.classList.remove('is-playing');
-    glyph.textContent = GLYPH_PLAY;
   }
 }
 
