@@ -136,9 +136,20 @@
     color: var(--text-muted);
   }
 
-  /* Below tablet: overlay at 88% width, image is NOT pushed. */
+  /* Tablet + mobile (≤ 1024px): reserve vertical room at the top for
+     the close button (16px from top, 36px tall = 52px) and at the
+     bottom for the control cluster (which on medium sits at
+     bottom: 48px + 44px height = 92px from viewport bottom). Generous
+     buffer so a long title or last paragraph doesn't graze the chrome. */
+  @media (max-width: 1024px) {
+    .sidebar { padding: 80px 40px 100px; }
+  }
+
+  /* Mobile (≤ 767px): sidebar overlays the canvas at 88% width and the
+     cluster sits higher (bottom: 72px → top edge at 112px from bottom),
+     so bump the bottom padding accordingly. */
   @media (max-width: 767px) {
-    .sidebar { width: 88%; padding: 32px 28px; }
+    .sidebar { width: 88%; padding: 80px 28px 120px; }
     .sidebar-title { font-size: 22px; }
     .sidebar-body { font-size: 14px; line-height: 1.65; }
   }
