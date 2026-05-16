@@ -19,14 +19,17 @@ type State = {
   // Slideshow
   isPlaying: boolean;
   slideshowTimer: number | null;
+  intervalMs: number;  // current dwell time per slide
 
   // Controls visibility
   controlsVisible: boolean;
   hideControlsTimer: number | null;
 };
 
+/** Cycle order for the speed button, in milliseconds. */
+const SLIDESHOW_INTERVALS_MS = [12_000, 24_000, 48_000, 96_000];
+
 const READY_DELAY = 2000;
-const SLIDESHOW_INTERVAL_MS = 12_000;
 const HIDE_CONTROLS_AFTER_MS = 3_000;
 
 export function mountViewer() {
@@ -56,6 +59,7 @@ export function mountViewer() {
 
     isPlaying: false,
     slideshowTimer: null,
+    intervalMs: SLIDESHOW_INTERVALS_MS[0]!,
 
     controlsVisible: false,
     hideControlsTimer: null,
@@ -210,7 +214,29 @@ function scheduleNextTick(root: HTMLElement, state: State) {
   state.slideshowTimer = window.setTimeout(() => {
     state.slideshowTimer = null;
     if (state.isPlaying) advance(root, state);
-  }, SLIDESHOW_INTERVAL_MS);
+  }, state.intervalMs);
+}
+
+function cycleSpeed(root: HTMLElement, state: State) {
+  const i = SLIDESHOW_INTERVALS_MS.indexOf(state.intervalMs);
+  const next = SLIDESHOW_INTERVALS_MS[(i + 1) % SLIDESHOW_INTERVALS_MS.length]!;
+  state.intervalMs = next;
+  updateSpeedButton(state);
+  // If currently playing, restart the timer so the new interval applies
+  // immediately instead of waiting for the next image change.
+  if (state.isPlaying) scheduleNextTick(root, state);
+}
+
+function updateSpeedButton(state: State) {
+  const btn = document.getElementById('ctrl-speed');
+  const label = document.getElementById('ctrl-speed-label');
+  if (!btn || !label) return;
+  const seconds = Math.round(state.intervalMs / 1000);
+  label.textContent = `${seconds}s`;
+  btn.setAttribute(
+    'aria-label',
+    `Slide interval: ${seconds} seconds. Click to change.`,
+  );
 }
 
 function play(root: HTMLElement, state: State) {
@@ -326,6 +352,7 @@ function attachInputs(root: HTMLElement, state: State) {
   const nextBtn = document.getElementById('ctrl-next') as HTMLButtonElement;
   const infoBtn = document.getElementById('ctrl-info') as HTMLButtonElement;
   const playBtn = document.getElementById('ctrl-play') as HTMLButtonElement;
+  const speedBtn = document.getElementById('ctrl-speed') as HTMLButtonElement;
   const fullscreenBtn = document.getElementById('ctrl-fullscreen') as HTMLButtonElement;
 
   prevBtn.addEventListener('click', (e) => {
@@ -348,6 +375,11 @@ function attachInputs(root: HTMLElement, state: State) {
   playBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     togglePlay(root, state);
+    showControls(state);
+  });
+  speedBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cycleSpeed(root, state);
     showControls(state);
   });
   fullscreenBtn.addEventListener('click', (e) => {
