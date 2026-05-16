@@ -102,7 +102,15 @@ import images from '../../data/images.json';
     user-select: none;
     transition: opacity var(--motion-cue) ease;
   }
-  .chrome-credit { left: 24px; }
+  .chrome-credit {
+    left: 24px;
+    /* Coordinate the fade with the sidebar slide-in so they feel like
+       one motion rather than two. */
+    transition: opacity var(--motion-sidebar) ease-out;
+  }
+  /* The title is already prominent in the sidebar header, so hide the
+     bottom-left credit while the sidebar is open. */
+  :global(body.sidebar-open) .chrome-credit { opacity: 0; }
 
   /* Slideshow controls — fixed to the viewport (NOT inside .viewer)
      so they stay put when the sidebar pushes the canvas. */
