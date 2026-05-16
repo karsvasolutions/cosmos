@@ -55,12 +55,18 @@ export function mountViewer() {
   render(root, state);
   attachInputs(root, state);
 
-  // Notify the rest of the app — info-sheet listens for this.
-  window.dispatchEvent(
-    new CustomEvent<{ image: Image }>('viewer:image', {
-      detail: { image: currentImage(state) },
-    }),
-  );
+  // Notify the rest of the app — the info sidebar listens for this.
+  // Defer one microtask so any sibling component's mount script (which
+  // may register the listener) has a chance to run first; without this
+  // the initial event fires before the sidebar subscribes and the panel
+  // shows empty until the user advances.
+  queueMicrotask(() => {
+    window.dispatchEvent(
+      new CustomEvent<{ image: Image }>('viewer:image', {
+        detail: { image: currentImage(state) },
+      }),
+    );
+  });
 }
 
 function shuffle(n: number): number[] {
