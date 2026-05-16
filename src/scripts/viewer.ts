@@ -282,15 +282,10 @@ function resetHideTimer(state: State) {
 /* ---------- Input wiring ---------- */
 
 function attachInputs(root: HTMLElement, state: State) {
-  const cue = root.querySelector<HTMLButtonElement>('#read-cue')!;
   const prevBtn = root.querySelector<HTMLButtonElement>('#ctrl-prev')!;
   const nextBtn = root.querySelector<HTMLButtonElement>('#ctrl-next')!;
+  const infoBtn = root.querySelector<HTMLButtonElement>('#ctrl-info')!;
   const playBtn = root.querySelector<HTMLButtonElement>('#ctrl-play')!;
-
-  cue.addEventListener('click', (e) => {
-    e.stopPropagation();
-    window.dispatchEvent(new CustomEvent('info:open'));
-  });
 
   prevBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -302,16 +297,20 @@ function attachInputs(root: HTMLElement, state: State) {
     advance(root, state);
     showControls(state);
   });
+  infoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    window.dispatchEvent(new CustomEvent('info:open'));
+    showControls(state);
+  });
   playBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     togglePlay(root, state);
     showControls(state);
   });
 
-  // Click on canvas (not a control / cue) advances — unless sheet is open.
+  // Click on canvas (not a control) advances — unless sheet is open.
   root.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
-    if (target.closest('#read-cue')) return;
     if (target.closest('#controls')) return;
     if (document.body.classList.contains('sheet-open')) {
       window.dispatchEvent(new CustomEvent('info:close'));

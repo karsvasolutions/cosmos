@@ -9,11 +9,6 @@ import images from '../../data/images.json';
     <span id="credit-text"></span>
   </div>
 
-  <button id="read-cue" class="chrome chrome-cue" type="button"
-          aria-haspopup="dialog" aria-controls="info-sheet">
-    ↑ read
-  </button>
-
   <div id="controls" class="controls" aria-hidden="true">
     <button id="ctrl-prev" class="ctrl ctrl-side ctrl-prev" type="button" aria-label="Previous image">
       <span aria-hidden="true">‹</span>
@@ -21,9 +16,16 @@ import images from '../../data/images.json';
     <button id="ctrl-next" class="ctrl ctrl-side ctrl-next" type="button" aria-label="Next image">
       <span aria-hidden="true">›</span>
     </button>
-    <button id="ctrl-play" class="ctrl ctrl-play" type="button" aria-label="Play slideshow">
-      <span id="ctrl-play-glyph" aria-hidden="true">▶</span>
-    </button>
+    <div class="ctrl-row">
+      <button id="ctrl-info" class="ctrl ctrl-center ctrl-info" type="button"
+              aria-label="Show image description"
+              aria-haspopup="dialog" aria-controls="info-sheet">
+        <span aria-hidden="true">i</span>
+      </button>
+      <button id="ctrl-play" class="ctrl ctrl-center ctrl-play" type="button" aria-label="Play slideshow">
+        <span id="ctrl-play-glyph" aria-hidden="true">▶</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -64,12 +66,6 @@ import images from '../../data/images.json';
     transition: opacity var(--motion-cue) ease;
   }
   .chrome-credit { left: 24px; }
-  .chrome-cue {
-    left: 50%; transform: translateX(-50%);
-    padding: 6px 10px;
-    cursor: pointer;
-  }
-  .chrome-cue:hover, .chrome-cue:focus-visible { color: var(--text-secondary); }
 
   /* Slideshow controls */
   .controls {
@@ -122,24 +118,36 @@ import images from '../../data/images.json';
     transform: translateY(-1px);
   }
 
-  .ctrl-play {
+  /* Centered cluster: info + play, side by side */
+  .ctrl-row {
+    position: absolute;
     left: 50%;
-    bottom: 56px;
+    bottom: 24px;
     transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+  }
+  .ctrl-center { position: static; }
+  .ctrl-info {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .ctrl-play {
     font-size: 14px;
     color: var(--text-primary);
   }
-  .ctrl-play:active { transform: translateX(-50%) scale(0.96); }
   .ctrl-play.is-playing #ctrl-play-glyph {
-    /* visually distinguish the pause state */
     letter-spacing: 0.06em;
   }
 
   @media (max-width: 480px) {
     .chrome-credit { left: 16px; max-width: calc(100vw - 32px); }
     .ctrl { width: 40px; height: 40px; font-size: 20px; }
+    .ctrl-info { font-size: 16px; }
     .ctrl-prev { left: 10px; }
     .ctrl-next { right: 10px; }
-    .ctrl-play { bottom: 52px; }
+    .ctrl-row { bottom: 20px; gap: 10px; }
   }
 </style>

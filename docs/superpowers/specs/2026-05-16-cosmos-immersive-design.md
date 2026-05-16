@@ -17,16 +17,15 @@ A website that displays the latest high-resolution images from space in an immer
 
 ## Experience
 
-**Default state.** A single image fills the viewport on a solid black background. Image uses `object-fit: contain`, centered. Two tiny pieces of chrome:
+**Default state.** A single image fills the viewport on a solid black background. Image uses `object-fit: contain`, centered. One piece of always-visible chrome:
 
 - Bottom-left: `TITLE · CREDIT` — 10px, letter-spacing 2px, color `#777`.
-- Bottom-center: `↑ read` cue — same weight, indicates info is available.
 
-No title, no header, no nav. The domain name is the only branding.
+No title, no header, no nav. The domain name is the only branding. All other controls (info, slideshow, prev/next) live in the hover-revealed control cluster (see Slideshow).
 
 **Advancing.** Press `↓`, `Space`, or click/tap anywhere outside the read cue → next image with a ~400ms cross-fade. Press `↑` to go back within session history (the list of advances in the current tab; not persisted across reloads). On touch devices, a downward swipe also advances. Order is shuffled per visit. When the user reaches the end of the batch, the list re-shuffles and continues from the start (infinite loop).
 
-**Info reveal.** Click the `↑ read` cue or press `i` → a translucent bottom sheet slides up over the bottom ~55% of the viewport. The image stays visible behind it. The sheet contains:
+**Info reveal.** Click the `i` button in the control cluster or press the `i` key → a translucent bottom sheet slides up over the bottom ~55% of the viewport. The image stays visible behind it. The sheet contains:
 
 - Title (16px)
 - Date the image was released
@@ -36,15 +35,15 @@ No title, no header, no nav. The domain name is the only branding.
 
 `esc` or clicking the image area closes the sheet. Advancing to the next image also closes it. While the sheet is open, click/tap on the image area closes the sheet rather than advancing; advancing requires `↓` / `Space` or closing first.
 
-**Slideshow.** Off by default — the user controls pacing. Three controls reveal on input (mouse-move, keypress, or tap) and auto-fade after 3 seconds of inactivity:
+**Slideshow.** Off by default — the user controls pacing. Four controls reveal on input (mouse-move, keypress, or tap) and auto-fade after 3 seconds of inactivity:
 
 - **Prev** (`‹`) — a circular button on the left edge, vertically centered.
 - **Next** (`›`) — a circular button on the right edge, vertically centered.
-- **Play / Pause** (`▶` / `❚❚`) — a circular button bottom-center, just above the read cue.
+- **Info** (`i`) and **Play / Pause** (`▶` / `❚❚`) — two circular buttons grouped bottom-center, info on the left, play on the right.
 
-When playing, the viewer auto-advances every 12 seconds. Any manual input (click, ↓, ↑, swipe, ‹, ›) resets the 12-second timer but does NOT pause the slideshow. Pressing the Play/Pause button toggles state. Keyboard shortcut: `p` toggles play/pause.
+When playing, the viewer auto-advances every 12 seconds. Any manual input (click, ↓, ↑, swipe, ‹, ›) resets the 12-second timer but does NOT pause the slideshow. Pressing the Play/Pause button toggles state. Keyboard shortcut: `p` toggles play/pause; `i` toggles the info sheet.
 
-Controls are styled to match the rest of the chrome — translucent disc with `backdrop-filter: blur(8px)`, `var(--text-muted)` border, white glyph on the active button. They never overlap the read cue, credit label, or info sheet. When the info sheet is open the slideshow pauses automatically and resumes when the sheet is closed (if it was playing before).
+Controls are styled to match the rest of the chrome — translucent disc with `backdrop-filter: blur(8px)`, `var(--hairline)` border, white glyph on the active button. They never overlap the credit label or info sheet. When the info sheet is open the slideshow pauses automatically and resumes when the sheet is closed (if it was playing before).
 
 On touch devices, any tap reveals the controls and resets the 3-second fade timer; tapping the image (outside any control) continues to advance.
 
@@ -196,7 +195,7 @@ Type roles:
 
 | Role | Font | Size | Tracking | Color |
 |---|---|---|---|---|
-| Chrome label (credit / `↑ read`) | Inter 400 | 10px | 0.2em | `--text-muted` |
+| Chrome label (credit line) | Inter 400 | 10px | 0.2em | `--text-muted` |
 | Info-sheet title | Playfair Display 600 | 22px | -0.01em | `--text-primary` |
 | Info-sheet meta (date, source link) | Inter 400 | 11px | 0.1em | `--text-secondary` |
 | Info-sheet body | Inter 400 | 14px | 0 | `--text-secondary` |
@@ -234,7 +233,7 @@ When `@media (prefers-reduced-motion: reduce)` matches: cross-fade is replaced w
 - An off-screen `<h1 class="sr-only">` reads "Cosmos — high-resolution images from space" for SEO and screen readers.
 - Each `<img>` has `alt={title}` (the image title, e.g. "Cosmic Cliffs in the Carina Nebula").
 - The info-sheet source link has a visible `:focus-visible` ring (`outline: 2px solid var(--focus-ring); outline-offset: 2px`). All other interactive surfaces (the image / read cue) also expose `:focus-visible`.
-- Tab order: read-cue → (when sheet open) source link → close button. `esc` exits the sheet from anywhere.
+- Tab order: prev → info → play → next → (when sheet open) source link → close button. `esc` exits the sheet from anywhere.
 - The info sheet is implemented as a `<dialog>` element where supported, with `aria-labelledby` pointing at the title. Falls back to `role="dialog"` + `aria-modal="true"` otherwise.
 - Keyboard shortcuts are documented in a hidden help string read on first load by screen readers: "Press down arrow or space to advance, up arrow to go back, i for info, escape to close info."
 - Respects `prefers-reduced-motion` as described above.
