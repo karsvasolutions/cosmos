@@ -23,7 +23,7 @@ A website that displays the latest high-resolution images from space in an immer
 
 No title, no header, no nav. The domain name is the only branding. All other controls (info, slideshow, prev/next) live in the hover-revealed control cluster (see Slideshow).
 
-**Advancing.** Press `→`, `Space`, or click/tap anywhere outside a control → next image with a ~400ms cross-fade. Press `←` to go back within session history (the list of advances in the current tab; not persisted across reloads). On touch devices, a horizontal swipe (left = next, right = prev) also navigates. Order is shuffled per visit. When the user reaches the end of the batch, the list re-shuffles and continues from the start (infinite loop).
+**Advancing.** Press `→` or click/tap anywhere outside a control → next image with a ~400ms cross-fade. Press `←` to go back within session history (the list of advances in the current tab; not persisted across reloads). On touch devices, a horizontal swipe (left = next, right = prev) also navigates. Order is shuffled per visit. When the user reaches the end of the batch, the list re-shuffles and continues from the start (infinite loop).
 
 **Info reveal.** Click the `i` button in the control cluster or press the `i` key → a left-anchored sidebar slides in and the image canvas eases over to the right to make room. Click the `i` button (or press `i`) again to close. Layout proportions follow the golden ratio:
 
@@ -46,7 +46,7 @@ The image canvas remains fully interactive while the sidebar is open: clicking i
 
 with a small extra gap between the info button and the media-control trio so the play/pause button reads as the center of the cluster.
 
-When playing, the viewer auto-advances every 12 seconds. Any manual input (click, `→`, `←`, `Space`, swipe, ‹, ›) resets the 12-second timer but does NOT pause the slideshow. Pressing the Play/Pause button toggles state. Keyboard shortcuts: `→` / `Space` next, `←` prev, `p` toggles play/pause, `i` toggles the info sidebar.
+When playing, the viewer auto-advances every 12 seconds. Any manual input (click, `→`, `←`, swipe, ‹, ›) resets the 12-second timer but does NOT pause the slideshow. Pressing the Play/Pause button toggles state. Keyboard shortcuts: `→` next, `←` prev, `Space` or `p` toggles play/pause, `i` toggles the info sidebar.
 
 Controls are styled to match the rest of the chrome — translucent disc with `backdrop-filter: blur(8px)`, `var(--hairline)` border, white glyph on the active button. They never overlap the credit label or info sheet. When the info sheet is open the slideshow pauses automatically and resumes when the sheet is closed (if it was playing before).
 
@@ -239,7 +239,7 @@ When `@media (prefers-reduced-motion: reduce)` matches: cross-fade is replaced w
 - The info-sheet source link has a visible `:focus-visible` ring (`outline: 2px solid var(--focus-ring); outline-offset: 2px`). All other interactive surfaces (the image / read cue) also expose `:focus-visible`.
 - Tab order: prev → info → play → next → (when sheet open) source link → close button. `esc` exits the sheet from anywhere.
 - The info sidebar is implemented as a semantic `<aside aria-label="Image description">` with `aria-hidden` toggled in sync with `body.sidebar-open`. It is not modal — the image canvas alongside it stays fully interactive.
-- Keyboard shortcuts are documented in a hidden help string read on first load by screen readers: "Press right arrow or space to advance, left arrow to go back, i to toggle info, p to toggle slideshow, escape to close info."
+- Keyboard shortcuts are documented in a hidden help string read on first load by screen readers: "Press right arrow to advance, left arrow to go back, space or p to play or pause the slideshow, i to toggle info, escape to close info."
 - Respects `prefers-reduced-motion` as described above.
 
 ## Testing

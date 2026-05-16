@@ -320,8 +320,6 @@ function attachInputs(root: HTMLElement, state: State) {
     showControls(state);
     switch (e.key) {
       case 'ArrowRight':
-      case ' ':
-      case 'Spacebar':
         e.preventDefault();
         advance(root, state);
         break;
@@ -329,15 +327,17 @@ function attachInputs(root: HTMLElement, state: State) {
         e.preventDefault();
         back(root, state);
         break;
-      case 'i':
-      case 'I':
-        e.preventDefault();
-        window.dispatchEvent(new CustomEvent('info:toggle'));
-        break;
+      case ' ':
+      case 'Spacebar':
       case 'p':
       case 'P':
         e.preventDefault();
         togglePlay(root, state);
+        break;
+      case 'i':
+      case 'I':
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('info:toggle'));
         break;
       case 'Escape':
         window.dispatchEvent(new CustomEvent('info:close'));
