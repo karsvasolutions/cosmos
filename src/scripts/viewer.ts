@@ -397,7 +397,9 @@ function attachInputs(root: HTMLElement, state: State) {
   // Click on canvas (not a control):
   // - If the sidebar is open, treat the click as "click outside" and
   //   close the sidebar (don't also advance — that would be jarring).
-  // - Otherwise, advance to the next image.
+  // - On touch-only devices, do nothing: a tap is too easy to fire by
+  //   accident; user navigates with swipes or the nav buttons.
+  // - Otherwise (mouse / pointer device), advance to the next image.
   root.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     if (target.closest('#controls')) return;
@@ -405,6 +407,7 @@ function attachInputs(root: HTMLElement, state: State) {
       window.dispatchEvent(new CustomEvent('info:close'));
       return;
     }
+    if (window.matchMedia('(hover: none)').matches) return;
     advance(root, state);
   });
 
