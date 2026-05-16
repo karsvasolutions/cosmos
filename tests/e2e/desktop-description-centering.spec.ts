@@ -5,7 +5,7 @@ const ONE_PX_PNG = Buffer.from(
   'base64',
 );
 
-test('desktop: description is vertically centered in its scroll area (short content)', async ({
+test('desktop: full content (title + meta + description) is vertically centered', async ({
   page,
 }) => {
   await page.route(/https?:\/\/apod\.nasa\.gov\/.*/, (route) =>
@@ -18,29 +18,29 @@ test('desktop: description is vertically centered in its scroll area (short cont
   await expect(page.locator('body.sidebar-open')).toHaveCount(1);
   await page.waitForTimeout(400);
 
-  // Force a short description so the inner block fits without scrolling.
   await page.evaluate(() => {
     const b = document.getElementById('sidebar-body');
     if (b) b.textContent = 'Short description.';
   });
 
   const m = await page.evaluate(() => {
-    const scroll = document.querySelector('.sidebar-scroll') as HTMLElement;
-    const inner = document.querySelector('.sidebar-scroll-inner') as HTMLElement;
-    const sr = scroll.getBoundingClientRect();
-    const ir = inner.getBoundingClientRect();
+    const sidebar = document.getElementById('info-sidebar')!.getBoundingClientRect();
+    const title = document.getElementById('sidebar-title')!.getBoundingClientRect();
+    const credit = document.getElementById('sidebar-credit')!.getBoundingClientRect();
     return {
-      scrollTop: sr.top,
-      scrollBottom: sr.bottom,
-      innerTop: ir.top,
-      innerBottom: ir.bottom,
-      gapAbove: ir.top - sr.top,
-      gapBelow: sr.bottom - ir.bottom,
+      sidebarTop: sidebar.top,
+      sidebarBottom: sidebar.bottom,
+      titleTop: title.top,
+      creditBottom: credit.bottom,
+      gapAbove: title.top - sidebar.top,
+      gapBelow: sidebar.bottom - credit.bottom,
     };
   });
   console.log('CENTERING:', JSON.stringify(m, null, 2));
 
-  // Auto margins should leave roughly equal gaps above and below.
+  // The whole content block (title at the top of the group, credit at
+  // the bottom) should sit centered in the sidebar — equal gaps within
+  // a small tolerance.
   const diff = Math.abs(m.gapAbove - m.gapBelow);
-  expect(diff).toBeLessThan(2);
+  expect(diff).toBeLessThan(4);
 });

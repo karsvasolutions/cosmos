@@ -69,15 +69,26 @@
     flex-direction: column;
   }
 
-  /* Desktop: vertically center the description block when it fits.
-     Auto margins collapse to 0 when content overflows, restoring
-     natural top-aligned scroll from the top. On mobile / tablet keep
-     top-alignment so the description reads predictably from the top
-     of the panel. */
+  /* Desktop: vertically center the WHOLE content block (title + meta
+     + description + credit) inside the sidebar. The sidebar itself
+     becomes the scroll container so when content overflows, auto
+     margins collapse and the user scrolls the whole panel normally.
+     Symmetric padding so the centering is true (no padding bias).
+     Mobile / tablet keep the fixed-header + scrollable-body pattern. */
   @media (min-width: 1025px) {
-    .sidebar-scroll-inner {
-      margin-top: auto;
+    .sidebar {
+      overflow-y: auto;
+      padding: 40px;
+    }
+    .sidebar-header { margin-top: auto; }
+    .sidebar-scroll {
+      flex: 0 0 auto;
+      overflow: visible;
       margin-bottom: auto;
+    }
+    .sidebar-scroll-inner {
+      margin-top: 0;
+      margin-bottom: 0;
     }
   }
 
@@ -172,11 +183,16 @@
     .sidebar-body { font-size: 14px; line-height: 1.65; }
   }
 
-  /* Subtle scrollbar inside the scrollable body */
-  .sidebar-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
-  .sidebar-scroll::-webkit-scrollbar { width: 6px; }
-  .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 3px; }
-  .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+  /* Subtle scrollbar — applied to whichever element actually scrolls
+     (the sidebar itself on desktop, the inner body region elsewhere). */
+  .sidebar-scroll,
+  .sidebar { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+  .sidebar-scroll::-webkit-scrollbar,
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar-scroll::-webkit-scrollbar-thumb,
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 3px; }
+  .sidebar-scroll::-webkit-scrollbar-track,
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
 
   @media (prefers-reduced-motion: reduce) {
     .sidebar { transition: transform 0.001ms; }
