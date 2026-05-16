@@ -35,10 +35,20 @@
     transform: translateX(-100%);
     transition: transform var(--motion-sidebar) ease-out;
     will-change: transform;
+
+    /* Vertically center the content when it fits in one screen; auto
+       margins collapse to 0 when content overflows, restoring natural
+       scroll from the top. */
+    display: flex;
+    flex-direction: column;
   }
   :global(body.sidebar-open) .sidebar { transform: translateX(0); }
 
-  .sidebar-inner { max-width: 52ch; }
+  .sidebar-inner {
+    max-width: 52ch;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
 
   .sidebar-title {
     margin: 0 0 14px;
