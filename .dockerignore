@@ -1,0 +1,16 @@
+node_modules
+dist
+.astro
+.vercel
+.git
+.github
+.superpowers
+.claude
+.vscode
+docs
+tests
+playwright-report
+test-results
+coverage
+*.log
+README.md
