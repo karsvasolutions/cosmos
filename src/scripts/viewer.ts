@@ -394,12 +394,17 @@ function attachInputs(root: HTMLElement, state: State) {
   document.addEventListener('fullscreenchange', syncFullscreenButton);
   syncFullscreenButton();
 
-  // Click on canvas (not a control) advances. With the sidebar open the
-  // image is to the right of the sidebar but still fully interactive —
-  // clicks advance, sidebar stays open and its content updates.
+  // Click on canvas (not a control):
+  // - If the sidebar is open, treat the click as "click outside" and
+  //   close the sidebar (don't also advance — that would be jarring).
+  // - Otherwise, advance to the next image.
   root.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     if (target.closest('#controls')) return;
+    if (document.body.classList.contains('sidebar-open')) {
+      window.dispatchEvent(new CustomEvent('info:close'));
+      return;
+    }
     advance(root, state);
   });
 
