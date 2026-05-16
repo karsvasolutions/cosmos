@@ -64,6 +64,35 @@ export function mountInfoSidebar() {
   // Clicks inside the sidebar shouldn't bubble out to the viewer (which
   // treats outside-control clicks as "advance to next image").
   sidebar.addEventListener('click', (e) => e.stopPropagation());
+
+  // Explicit close button (visible on mobile + tablet via CSS).
+  const closeBtn = sidebar.querySelector<HTMLButtonElement>('#sidebar-close');
+  closeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    close();
+  });
+
+  // Swipe-left to close (touch). The sidebar slid in from the left, so
+  // pushing it back left is the natural dismiss gesture. Distinguish
+  // from a vertical scroll by requiring horizontal movement to dominate
+  // and exceed a 40 px threshold.
+  let touchStartX = 0;
+  let touchStartY = 0;
+  sidebar.addEventListener(
+    'touchstart',
+    (e) => {
+      touchStartX = e.touches[0]!.clientX;
+      touchStartY = e.touches[0]!.clientY;
+    },
+    { passive: true },
+  );
+  sidebar.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0]!.clientX - touchStartX;
+    const dy = e.changedTouches[0]!.clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && dx < -40) {
+      close();
+    }
+  });
 }
 
 function formatDate(iso: string): string {

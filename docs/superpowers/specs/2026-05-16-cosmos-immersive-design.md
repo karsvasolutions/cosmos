@@ -25,7 +25,7 @@ No title, no header, no nav. The domain name is the only branding. All other con
 
 **Advancing.** Press `→` or click/tap anywhere outside a control → next image with a ~400ms cross-fade. Press `←` to go back within session history (the list of advances in the current tab; not persisted across reloads). On touch devices, a horizontal swipe (left = next, right = prev) also navigates. Order is shuffled per visit. When the user reaches the end of the batch, the list re-shuffles and continues from the start (infinite loop).
 
-**Info reveal.** Click the `i` button in the control cluster or press the `i` key → a left-anchored sidebar slides in and the image canvas eases over to the right to make room. Click the `i` button (or press `i`) again to close. Layout proportions follow the golden ratio:
+**Info reveal.** Click the `i` button in the control cluster or press the `i` key → a left-anchored sidebar slides in and the image canvas eases over to the right to make room. Click the `i` button (or press `i`) again to close. On mobile and tablet (≤ 1024 px) the sidebar also shows an explicit close `×` button at its top-right corner, and a left-swipe gesture (touch) closes it — both shortcuts since the bottom-center control cluster is harder to reach when the sidebar covers most of the viewport. Layout proportions follow the golden ratio:
 
 - Sidebar width: **38.2%** of the viewport (the small portion of φ).
 - Image canvas: **61.8%** (the large portion of φ).
