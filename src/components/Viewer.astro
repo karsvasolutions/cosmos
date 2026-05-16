@@ -209,11 +209,14 @@ import images from '../../data/images.json';
   .ctrl-fullscreen.is-fullscreen .icon-maximize { display: none; }
   .ctrl-fullscreen.is-fullscreen .icon-minimize { display: block; }
 
+  /* Mobile + medium (≤ 1024px): lift the control cluster off the
+     bottom edge so it doesn't crowd the credit chrome below it. */
+  @media (max-width: 1024px) {
+    .ctrl-row { bottom: 50px; }
+  }
+
+  /* Mobile only (≤ 480px): smaller buttons + tighter gap. */
   @media (max-width: 480px) {
-    /* Keep the credit at its default bottom-left position; instead,
-       raise the control cluster so the buttons sit above any wrapped
-       credit text (1–2 lines of ~10px Inter + line-height = ~28px,
-       so leave ~50px headroom above the credit). */
     .chrome-credit {
       left: 16px;
       max-width: calc(100vw - 32px);
@@ -221,6 +224,6 @@ import images from '../../data/images.json';
     .ctrl { width: 40px; height: 40px; }
     .icon { width: 16px; height: 16px; }
     .icon-play { width: 14px; height: 14px; }
-    .ctrl-row { bottom: 80px; gap: 10px; }
+    .ctrl-row { gap: 10px; }
   }
 </style>
