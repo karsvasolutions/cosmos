@@ -170,7 +170,7 @@ import images from '../../data/images.json';
   .ctrl-row {
     position: absolute;
     left: 50%;
-    bottom: 60px;
+    bottom: 48px;  /* medium + large screens */
     transform: translateX(-50%);
     display: flex;
     align-items: center;
@@ -209,7 +209,8 @@ import images from '../../data/images.json';
   .ctrl-fullscreen.is-fullscreen .icon-maximize { display: none; }
   .ctrl-fullscreen.is-fullscreen .icon-minimize { display: block; }
 
-  /* Mobile only (≤ 480px): smaller buttons + tighter gap. */
+  /* Mobile only (≤ 480px): lift the cluster a bit higher off the
+     bottom edge, smaller buttons, tighter gap. */
   @media (max-width: 480px) {
     .chrome-credit {
       left: 16px;
@@ -218,6 +219,6 @@ import images from '../../data/images.json';
     .ctrl { width: 40px; height: 40px; }
     .icon { width: 16px; height: 16px; }
     .icon-play { width: 14px; height: 14px; }
-    .ctrl-row { gap: 10px; }
+    .ctrl-row { bottom: 60px; gap: 10px; }
   }
 </style>
