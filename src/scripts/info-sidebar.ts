@@ -1,5 +1,11 @@
 import type { Image } from '../../ingest/types';
 
+declare global {
+  interface Window {
+    __cosmosCurrentImage?: Image;
+  }
+}
+
 export function mountInfoSidebar() {
   const sidebar = document.getElementById('info-sidebar');
   if (!sidebar) return;
@@ -35,6 +41,14 @@ export function mountInfoSidebar() {
   function toggle() {
     if (isOpen()) close();
     else open();
+  }
+
+  // If the viewer has already published the current image before we
+  // subscribed, render it immediately. (Astro bundles each component's
+  // hoisted <script> into a single module, so the viewer's
+  // mountViewer() can complete before our listener attaches.)
+  if (window.__cosmosCurrentImage) {
+    render(window.__cosmosCurrentImage);
   }
 
   // Keep content in sync as images change.

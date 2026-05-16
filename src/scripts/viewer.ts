@@ -1,5 +1,14 @@
 import type { Image } from '../../ingest/types';
 
+// A tiny global so any later-mounting subscriber (e.g. the info sidebar)
+// can read the currently displayed image even if it missed the initial
+// `viewer:image` event.
+declare global {
+  interface Window {
+    __cosmosCurrentImage?: Image;
+  }
+}
+
 type State = {
   images: Image[];
   order: number[];     // shuffled index into images
@@ -55,18 +64,16 @@ export function mountViewer() {
   render(root, state);
   attachInputs(root, state);
 
-  // Notify the rest of the app — the info sidebar listens for this.
-  // Defer one microtask so any sibling component's mount script (which
-  // may register the listener) has a chance to run first; without this
-  // the initial event fires before the sidebar subscribes and the panel
-  // shows empty until the user advances.
-  queueMicrotask(() => {
-    window.dispatchEvent(
-      new CustomEvent<{ image: Image }>('viewer:image', {
-        detail: { image: currentImage(state) },
-      }),
-    );
-  });
+  publishCurrentImage(currentImage(state));
+}
+
+function publishCurrentImage(img: Image) {
+  // Stash the current image on window so any later-mounting subscriber
+  // can read it on mount (and not depend on event timing).
+  window.__cosmosCurrentImage = img;
+  window.dispatchEvent(
+    new CustomEvent<{ image: Image }>('viewer:image', { detail: { image: img } }),
+  );
 }
 
 function shuffle(n: number): number[] {
@@ -158,12 +165,7 @@ function swap(root: HTMLElement, state: State, img: Image) {
     const credit = root.querySelector<HTMLSpanElement>('#credit-text')!;
     credit.textContent = `${img.title.toUpperCase()} · ${img.credit.toUpperCase()}`;
 
-    window.dispatchEvent(
-      new CustomEvent<{ image: Image }>('viewer:image', {
-        detail: { image: img },
-      }),
-    );
-
+    publishCurrentImage(img);
     preloadNext(state);
 
     // Reschedule the slideshow timer whenever the displayed image changes —

@@ -15,6 +15,22 @@ test.beforeEach(async ({ page }) => {
   );
 });
 
+test('sidebar populates on first open (before any nav)', async ({ page }) => {
+  await page.goto('/');
+  // Wait for the viewer to be ready.
+  await expect(page.locator('#viewer img.is-active')).toHaveCount(1, { timeout: 5000 });
+
+  // Open the sidebar immediately, without advancing.
+  await page.keyboard.press('i');
+  await expect(page.locator('body.sidebar-open')).toHaveCount(1);
+
+  // Both the title and the source link must be populated.
+  await expect(page.locator('#sidebar-title')).not.toBeEmpty();
+  const href = await page.locator('#sidebar-link').getAttribute('href');
+  expect(href).toBeTruthy();
+  expect(href).toMatch(/^https?:\/\//);
+});
+
 test('viewer renders an image and responds to inputs', async ({ page }) => {
   await page.goto('/');
 
