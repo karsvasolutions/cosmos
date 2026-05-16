@@ -214,6 +214,16 @@ import images from '../../data/images.json';
     .ctrl-row { bottom: 48px; }
   }
 
+  /* Mobile (≤ 767px): when the sidebar is open it covers most of the
+     viewport, so hide the bottom-center control cluster — the user
+     navigates via the sidebar's close button and swipe instead. */
+  @media (max-width: 767px) {
+    :global(body.sidebar-open) .controls {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
   /* Mobile (≤ 480px): smaller buttons, tighter gap, even higher cluster. */
   @media (max-width: 480px) {
     .chrome-credit {
