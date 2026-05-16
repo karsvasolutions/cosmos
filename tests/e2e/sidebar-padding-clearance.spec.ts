@@ -11,14 +11,15 @@ test.beforeEach(async ({ page }) => {
   );
 });
 
-// Title is in the fixed header at the top of the sidebar; it must
-// clear the absolutely-positioned close × button in the top-right.
+// With the centered-everywhere layout, the title sits in the middle
+// of the sidebar (not at the top), so a normal short-description page
+// puts the title far below the close button. Verify positive gap.
 for (const { name, width, height } of [
   { name: 'mobile 375', width: 375, height: 667 },
   { name: 'tablet 900', width: 900, height: 1200 },
   { name: 'desktop 1440', width: 1440, height: 900 },
 ]) {
-  test(`title clears close button at top on ${name}`, async ({ page }) => {
+  test(`title clears close button on ${name}`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await page.goto('/');
     await page.waitForSelector('#viewer img.is-active');
@@ -35,9 +36,9 @@ for (const { name, width, height } of [
   });
 }
 
-// The header is fixed (does not scroll); only the body+credit block
-// scrolls when the description is long. Verify that.
-test('header stays put while body scrolls (long description)', async ({ page }) => {
+// Mobile only: the header is fixed at the top of the sidebar; only the
+// body+credit region scrolls when the description is long.
+test('mobile: header stays put while body scrolls', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 667 });
   await page.goto('/');
   await page.waitForSelector('#viewer img.is-active');
@@ -53,18 +54,13 @@ test('header stays put while body scrolls (long description)', async ({ page }) 
   const before = await page.locator('#sidebar-title').evaluate(
     (el) => el.getBoundingClientRect().top,
   );
-
-  // Scroll the body region.
   await page.evaluate(() => {
     const s = document.querySelector('.sidebar-scroll') as HTMLElement;
     s.scrollTop = s.scrollHeight;
   });
   await page.waitForTimeout(100);
-
   const after = await page.locator('#sidebar-title').evaluate(
     (el) => el.getBoundingClientRect().top,
   );
-
-  // Title should not have moved at all.
   expect(after).toBe(before);
 });

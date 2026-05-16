@@ -30,6 +30,9 @@
 </script>
 
 <style>
+  /* Base (mobile): fixed header at top + scrollable body below.
+     On ≥ 768 px (tablet + desktop), this switches to vertically
+     centering the whole content block — see media query below. */
   .sidebar {
     position: fixed;
     left: 0; top: 0; bottom: 0;
@@ -44,9 +47,6 @@
     transition: transform var(--motion-sidebar) ease-out;
     will-change: transform;
 
-    /* Fixed header + scrollable body inside a flex column.
-       The header sticks to the top of the inner padded area; the
-       scroll body takes the remaining height. */
     display: flex;
     flex-direction: column;
   }
@@ -59,36 +59,25 @@
 
   .sidebar-scroll {
     flex: 1 1 auto;
-    min-height: 0;  /* required for flex children to allow shrinking */
+    min-height: 0;
     overflow-y: auto;
     max-width: 52ch;
-
-    /* Make the scroll area itself a flex column so the inner block
-       can use auto margins to vertically center when it fits. */
-    display: flex;
-    flex-direction: column;
   }
 
-  /* Desktop: vertically center the WHOLE content block (title + meta
-     + description + credit) inside the sidebar. The sidebar itself
-     becomes the scroll container so when content overflows, auto
-     margins collapse and the user scrolls the whole panel normally.
-     Symmetric padding so the centering is true (no padding bias).
-     Mobile / tablet keep the fixed-header + scrollable-body pattern. */
-  @media (min-width: 1025px) {
+  /* Tablet + desktop (≥ 768 px): vertically center the WHOLE content
+     block. The sidebar itself becomes the scroll container; auto
+     margins on header (top) and scroll wrapper (bottom) push the
+     block to the middle. */
+  @media (min-width: 768px) {
     .sidebar {
-      overflow-y: auto;
       padding: 40px;
+      overflow-y: auto;
     }
     .sidebar-header { margin-top: auto; }
     .sidebar-scroll {
       flex: 0 0 auto;
       overflow: visible;
       margin-bottom: auto;
-    }
-    .sidebar-scroll-inner {
-      margin-top: 0;
-      margin-bottom: 0;
     }
   }
 
@@ -165,18 +154,9 @@
     color: var(--text-muted);
   }
 
-  /* Tablet + mobile (≤ 1024px): reserve top room for the close button
-     (16px from top, 32px tall = 48px) and bottom room for the control
-     cluster (medium: bottom: 48px + 44px height = 92px from viewport
-     bottom). The header sits at the top of the padded area; the
-     scroll body ends at the bottom of the padded area. */
-  @media (max-width: 1024px) {
-    .sidebar { padding: 56px 40px 100px; }
-  }
-
-  /* Mobile (≤ 767px): sidebar overlays the canvas at 88% width.
-     The control cluster is hidden when sidebar is open here, so we
-     only need the close-button top clearance — bottom can be tighter. */
+  /* Mobile (≤ 767 px): sidebar overlays the canvas at 88% width.
+     Keep the fixed-header pattern (set in base rules) and tighten the
+     side padding + type sizes for the narrower viewport. */
   @media (max-width: 767px) {
     .sidebar { width: 88%; padding: 56px 28px 32px; }
     .sidebar-title { font-size: 22px; }
