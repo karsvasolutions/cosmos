@@ -34,12 +34,18 @@ test('viewer renders an image and responds to inputs', async ({ page }) => {
   const secondSrc = await page.locator('#viewer img.is-active').getAttribute('src');
   expect(secondSrc).not.toBe(firstSrc);
 
-  // Press i -> sheet opens
+  // Press i -> sidebar opens (body gets sidebar-open class)
   await page.keyboard.press('i');
-  await expect(page.locator('#info-sheet[open]')).toBeVisible();
-  await expect(page.locator('#sheet-title')).not.toBeEmpty();
+  await expect(page.locator('body.sidebar-open')).toHaveCount(1);
+  await expect(page.locator('#sidebar-title')).not.toBeEmpty();
 
-  // Press Escape -> sheet closes
+  // Press i again -> sidebar toggles closed
+  await page.keyboard.press('i');
+  await expect(page.locator('body.sidebar-open')).toHaveCount(0);
+
+  // Press i to reopen, then Escape -> sidebar closes
+  await page.keyboard.press('i');
+  await expect(page.locator('body.sidebar-open')).toHaveCount(1);
   await page.keyboard.press('Escape');
-  await expect(page.locator('#info-sheet[open]')).toHaveCount(0);
+  await expect(page.locator('body.sidebar-open')).toHaveCount(0);
 });

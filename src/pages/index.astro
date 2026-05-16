@@ -1,7 +1,7 @@
 ---
 import '../styles/globals.css';
 import Viewer from '../components/Viewer.astro';
-import InfoSheet from '../components/InfoSheet.astro';
+import InfoSidebar from '../components/InfoSidebar.astro';
 ---
 <!doctype html>
 <html lang="en">
@@ -16,9 +16,10 @@ import InfoSheet from '../components/InfoSheet.astro';
     <h1 class="sr-only">Cosmos — high-resolution images from space</h1>
     <p class="sr-only" id="kbd-help">
       Press down arrow or space to advance, up arrow to go back,
-      i to open the description, escape to close.
+      i to toggle the description sidebar, p to toggle the slideshow,
+      escape to close.
     </p>
     <Viewer />
-    <InfoSheet />
+    <InfoSidebar />
   </body>
 </html>

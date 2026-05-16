@@ -10,8 +10,6 @@ type State = {
   // Slideshow
   isPlaying: boolean;
   slideshowTimer: number | null;
-  /** True if slideshow was playing before the info sheet opened. */
-  pausedBySheet: boolean;
 
   // Controls visibility
   controlsVisible: boolean;
@@ -49,7 +47,6 @@ export function mountViewer() {
 
     isPlaying: false,
     slideshowTimer: null,
-    pausedBySheet: false,
 
     controlsVisible: false,
     hideControlsTimer: null,
@@ -295,7 +292,7 @@ function attachInputs(root: HTMLElement, state: State) {
   });
   infoBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    window.dispatchEvent(new CustomEvent('info:open'));
+    window.dispatchEvent(new CustomEvent('info:toggle'));
     showControls(state);
   });
   playBtn.addEventListener('click', (e) => {
@@ -304,14 +301,12 @@ function attachInputs(root: HTMLElement, state: State) {
     showControls(state);
   });
 
-  // Click on canvas (not a control) advances — unless sheet is open.
+  // Click on canvas (not a control) advances. With the sidebar open the
+  // image is to the right of the sidebar but still fully interactive —
+  // clicks advance, sidebar stays open and its content updates.
   root.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     if (target.closest('#controls')) return;
-    if (document.body.classList.contains('sheet-open')) {
-      window.dispatchEvent(new CustomEvent('info:close'));
-      return;
-    }
     advance(root, state);
   });
 
@@ -337,7 +332,7 @@ function attachInputs(root: HTMLElement, state: State) {
       case 'i':
       case 'I':
         e.preventDefault();
-        window.dispatchEvent(new CustomEvent('info:open'));
+        window.dispatchEvent(new CustomEvent('info:toggle'));
         break;
       case 'p':
       case 'P':
@@ -372,18 +367,4 @@ function attachInputs(root: HTMLElement, state: State) {
     }
   });
 
-  // Coordinate with the info sheet: pause while open, resume on close
-  // if we were playing before.
-  window.addEventListener('info:open', () => {
-    if (state.isPlaying) {
-      state.pausedBySheet = true;
-      pause(state);
-    }
-  });
-  window.addEventListener('info:close', () => {
-    if (state.pausedBySheet) {
-      state.pausedBySheet = false;
-      play(root, state);
-    }
-  });
 }

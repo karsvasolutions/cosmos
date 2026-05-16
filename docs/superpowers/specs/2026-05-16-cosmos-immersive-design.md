@@ -25,15 +25,20 @@ No title, no header, no nav. The domain name is the only branding. All other con
 
 **Advancing.** Press `↓`, `Space`, or click/tap anywhere outside the read cue → next image with a ~400ms cross-fade. Press `↑` to go back within session history (the list of advances in the current tab; not persisted across reloads). On touch devices, a downward swipe also advances. Order is shuffled per visit. When the user reaches the end of the batch, the list re-shuffles and continues from the start (infinite loop).
 
-**Info reveal.** Click the `i` button in the control cluster or press the `i` key → a translucent bottom sheet slides up over the bottom ~55% of the viewport. The image stays visible behind it. The sheet contains:
+**Info reveal.** Click the `i` button in the control cluster or press the `i` key → a left-anchored sidebar slides in and the image canvas eases over to the right to make room. Click the `i` button (or press `i`) again to close. Layout proportions follow the golden ratio:
 
-- Title (16px)
-- Date the image was released
-- Full description (plain text, may be 1–3 paragraphs)
+- Sidebar width: **38.2%** of the viewport (the small portion of φ).
+- Image canvas: **61.8%** (the large portion of φ).
+- Below 768px, the sidebar instead overlays at 88% width and the image is not pushed.
+
+The sidebar contains:
+
+- Title (large, Playfair serif)
+- Date the image was released · link to the source page on `apod.nasa.gov`
+- Full description (plain text, scrollable inside the sidebar if it overflows)
 - Credit line
-- A link to the source page on `nasa.gov` / `esahubble.org` / `esawebb.org`
 
-`esc` or clicking the image area closes the sheet. Advancing to the next image also closes it. While the sheet is open, click/tap on the image area closes the sheet rather than advancing; advancing requires `↓` / `Space` or closing first.
+The image canvas remains fully interactive while the sidebar is open: clicking it still advances to the next image, and the sidebar's content updates to match. `esc` closes the sidebar. The transition (sidebar slide + canvas push) animates over ~280ms with `ease-out`; under `prefers-reduced-motion` it collapses to an instant swap.
 
 **Slideshow.** Off by default — the user controls pacing. Four controls reveal on input (mouse-move, keypress, or tap) and auto-fade after 3 seconds of inactivity:
 
@@ -108,11 +113,10 @@ src/
     index.astro              ← the only page; renders <Viewer/>
   components/
     Viewer.astro             ← container; embeds images.json + script
-    ImageSlide.astro         ← one fullscreen slide (server-rendered shell)
-    InfoSheet.astro          ← the bottom-sheet markup
+    InfoSidebar.astro        ← the left sidebar markup
   scripts/
     viewer.ts                ← shuffle, advance, preload, key handlers
-    info-sheet.ts            ← open/close the sheet
+    info-sidebar.ts          ← open/close/toggle the sidebar
   styles/
     globals.css              ← reset + dark theme tokens
 data/
@@ -143,14 +147,14 @@ Responsibilities:
 - When index reaches end of array: re-shuffle, reset to 0, continue.
 - On image `error`: remove that entry from the in-memory list, log to console, advance to next.
 
-### `InfoSheet.astro` + `info-sheet.ts`
+### `InfoSidebar.astro` + `info-sidebar.ts`
 
 Responsibilities:
 
 - Render markup for the title, date, description, credit, and source link.
-- Slide-up animation (~250ms) over the bottom 55% of the viewport.
-- Translucent panel: `rgba(0,0,0,0.45)` + `backdrop-filter: blur(24px) saturate(140%)` + 1px top border `rgba(255,255,255,0.08)`. The image stays visible (and softly blurred) behind the panel — the goal is "the image is still the canvas; text floats over it."
-- Close on `esc`, on click of image area, or on advance.
+- Animate in from the left (transform translateX) and animate the viewer canvas's `left` offset to 38.2% — both with ~280ms `ease-out`.
+- Solid dark panel (no transparency needed since the image is now beside, not behind): `#0a0a0f` with a 1px right hairline border.
+- Listens for `info:toggle`, `info:open`, `info:close` and toggles `body.sidebar-open` accordingly. Updates its content whenever the viewer fires `viewer:image` so the panel stays in sync with the currently-displayed image.
 
 ### `ingest/` — data pipeline
 
@@ -211,7 +215,7 @@ Body uses `line-height: 1.65` and `max-width: 60ch` for comfortable reading.
   --text-secondary:   #B0B0B0;       /* info sheet body */
   --text-muted:       #777777;       /* chrome labels — meets 4.5:1 on #000 */
   --hairline:         rgba(255,255,255,0.08);
-  --sheet-bg:         rgba(0, 0, 0, 0.45);    /* image stays visible through panel */
+  --sidebar-bg:       #0a0a0f;                /* solid; image is beside, not behind */
   --focus-ring:       rgba(220,220,255,0.65);
 }
 ```
@@ -223,10 +227,10 @@ All text/background combinations meet WCAG AA (4.5:1) on `#000`.
 | Token | Duration | Easing | Notes |
 |---|---|---|---|
 | `--motion-fade` | 400ms | ease-in-out | image cross-fade on advance |
-| `--motion-sheet` | 250ms | ease-out | info-sheet slide-in |
+| `--motion-sidebar` | 280ms | ease-out | sidebar slide + canvas push |
 | `--motion-cue` | 200ms | ease | hover/focus on cue |
 
-When `@media (prefers-reduced-motion: reduce)` matches: cross-fade is replaced with an instant swap, sheet appears without slide (opacity only, 100ms). No parallax or scroll-jacking effects anywhere.
+When `@media (prefers-reduced-motion: reduce)` matches: cross-fade is replaced with an instant swap, sidebar appears without slide (instant transition). No parallax or scroll-jacking effects anywhere.
 
 ### Accessibility requirements
 
@@ -234,7 +238,7 @@ When `@media (prefers-reduced-motion: reduce)` matches: cross-fade is replaced w
 - Each `<img>` has `alt={title}` (the image title, e.g. "Cosmic Cliffs in the Carina Nebula").
 - The info-sheet source link has a visible `:focus-visible` ring (`outline: 2px solid var(--focus-ring); outline-offset: 2px`). All other interactive surfaces (the image / read cue) also expose `:focus-visible`.
 - Tab order: prev → info → play → next → (when sheet open) source link → close button. `esc` exits the sheet from anywhere.
-- The info sheet is implemented as a `<dialog>` element where supported, with `aria-labelledby` pointing at the title. Falls back to `role="dialog"` + `aria-modal="true"` otherwise.
+- The info sidebar is implemented as a semantic `<aside aria-label="Image description">` with `aria-hidden` toggled in sync with `body.sidebar-open`. It is not modal — the image canvas alongside it stays fully interactive.
 - Keyboard shortcuts are documented in a hidden help string read on first load by screen readers: "Press down arrow or space to advance, up arrow to go back, i for info, escape to close info."
 - Respects `prefers-reduced-motion` as described above.
 

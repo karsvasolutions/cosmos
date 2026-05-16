@@ -49,6 +49,15 @@ import images from '../../data/images.json';
     position: fixed;
     inset: 0;
     background: var(--canvas);
+    transition: left var(--motion-sidebar) ease-out;
+  }
+  /* When the sidebar is open on tablet+, push the canvas right by the
+     golden-ratio amount so image + sidebar share the screen. */
+  :global(body.sidebar-open) .viewer {
+    left: var(--sidebar-width);
+  }
+  @media (max-width: 767px) {
+    :global(body.sidebar-open) .viewer { left: 0; }
   }
   .slide {
     position: absolute;

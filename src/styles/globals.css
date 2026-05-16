@@ -12,8 +12,11 @@
   --focus-ring:       rgba(220, 220, 255, 0.65);
 
   --motion-fade:      400ms;
-  --motion-sheet:     250ms;
+  --motion-sidebar:   280ms;
   --motion-cue:       200ms;
+
+  /* Golden-ratio split: sidebar = 1 / φ² of viewport */
+  --sidebar-width:    38.2%;
 
   --font-sans:        'Inter', system-ui, -apple-system, sans-serif;
   --font-serif:       'Playfair Display', Georgia, serif;
@@ -50,9 +53,9 @@ a { color: inherit; }
 /* Reduced motion — globally cap durations */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --motion-fade:  0ms;
-    --motion-sheet: 100ms;
-    --motion-cue:   0ms;
+    --motion-fade:    0ms;
+    --motion-sidebar: 0ms;
+    --motion-cue:     0ms;
   }
   * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
 }
