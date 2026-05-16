@@ -281,10 +281,12 @@ function resetHideTimer(state: State) {
 /* ---------- Input wiring ---------- */
 
 function attachInputs(root: HTMLElement, state: State) {
-  const prevBtn = root.querySelector<HTMLButtonElement>('#ctrl-prev')!;
-  const nextBtn = root.querySelector<HTMLButtonElement>('#ctrl-next')!;
-  const infoBtn = root.querySelector<HTMLButtonElement>('#ctrl-info')!;
-  const playBtn = root.querySelector<HTMLButtonElement>('#ctrl-play')!;
+  // Controls live outside the viewer so we look them up globally.
+  const controls = document.getElementById('controls')!;
+  const prevBtn = document.getElementById('ctrl-prev') as HTMLButtonElement;
+  const nextBtn = document.getElementById('ctrl-next') as HTMLButtonElement;
+  const infoBtn = document.getElementById('ctrl-info') as HTMLButtonElement;
+  const playBtn = document.getElementById('ctrl-play') as HTMLButtonElement;
 
   prevBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -318,10 +320,12 @@ function attachInputs(root: HTMLElement, state: State) {
     advance(root, state);
   });
 
-  // Reveal controls on mouse-move (desktop).
-  root.addEventListener('mousemove', () => {
-    showControls(state);
-  });
+  // Reveal controls on mouse-move over the image area or over the
+  // controls themselves (so hovering them keeps the auto-hide timer
+  // alive). We don't listen on the sidebar — moving the cursor there
+  // while reading shouldn't keep popping the controls back up.
+  root.addEventListener('mousemove', () => showControls(state));
+  controls.addEventListener('mousemove', () => showControls(state));
 
   window.addEventListener('keydown', (e) => {
     if (e.target instanceof HTMLAnchorElement) return;

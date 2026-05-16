@@ -8,32 +8,34 @@ import images from '../../data/images.json';
   <div class="chrome chrome-credit" aria-hidden="true">
     <span id="credit-text"></span>
   </div>
+</div>
 
-  <div id="controls" class="controls" aria-hidden="true">
-    <div class="ctrl-row">
-      <button id="ctrl-info" class="ctrl ctrl-center ctrl-info" type="button"
-              aria-label="Show image description"
-              aria-haspopup="dialog" aria-controls="info-sidebar">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 16v-4"/>
-          <path d="M12 8h.01"/>
-        </svg>
-      </button>
-      <button id="ctrl-prev" class="ctrl ctrl-center ctrl-prev" type="button" aria-label="Previous image">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-      </button>
-      <button id="ctrl-play" class="ctrl ctrl-center ctrl-play" type="button" aria-label="Play slideshow">
-        <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-        <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="6" y="4" width="4" height="16" rx="1"/>
-          <rect x="14" y="4" width="4" height="16" rx="1"/>
-        </svg>
-      </button>
-      <button id="ctrl-next" class="ctrl ctrl-center ctrl-next" type="button" aria-label="Next image">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
-    </div>
+<!-- Controls live OUTSIDE the viewer so they stay fixed to the viewport
+     and don't shift when the sidebar pushes the canvas right. -->
+<div id="controls" class="controls" aria-hidden="true">
+  <div class="ctrl-row">
+    <button id="ctrl-info" class="ctrl ctrl-center ctrl-info" type="button"
+            aria-label="Show image description"
+            aria-haspopup="dialog" aria-controls="info-sidebar">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 16v-4"/>
+        <path d="M12 8h.01"/>
+      </svg>
+    </button>
+    <button id="ctrl-prev" class="ctrl ctrl-center ctrl-prev" type="button" aria-label="Previous image">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <button id="ctrl-play" class="ctrl ctrl-center ctrl-play" type="button" aria-label="Play slideshow">
+      <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+      <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="6" y="4" width="4" height="16" rx="1"/>
+        <rect x="14" y="4" width="4" height="16" rx="1"/>
+      </svg>
+    </button>
+    <button id="ctrl-next" class="ctrl ctrl-center ctrl-next" type="button" aria-label="Next image">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
   </div>
 </div>
 
@@ -84,13 +86,18 @@ import images from '../../data/images.json';
   }
   .chrome-credit { left: 24px; }
 
-  /* Slideshow controls */
+  /* Slideshow controls — fixed to the viewport (NOT inside .viewer)
+     so they stay put when the sidebar pushes the canvas. */
   .controls {
-    position: absolute;
+    position: fixed;
     inset: 0;
     pointer-events: none;
     opacity: 0;
     transition: opacity var(--motion-cue) ease;
+    /* Stay above the sidebar so the info button remains clickable
+       even on narrow viewports where the cluster might brush the
+       sidebar's right edge. */
+    z-index: 20;
   }
   .controls.is-visible { opacity: 1; }
   .controls.is-visible .ctrl { pointer-events: auto; }
