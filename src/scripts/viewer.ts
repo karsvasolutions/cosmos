@@ -151,6 +151,11 @@ function render(root: HTMLElement, state: State) {
   slotEl.onload = () => {
     setLoading(state, false);
     slotEl.classList.add('is-active');
+    // Only start the slideshow timer once the user can actually see
+    // the first image. play() (called from mountViewer) intentionally
+    // skips scheduling while isLoading is true so we get the full
+    // intervalMs viewing window from this moment forward.
+    if (state.isPlaying) scheduleNextTick(root, state);
   };
   slotEl.onerror = () => setLoading(state, false);
 
@@ -310,7 +315,10 @@ function play(root: HTMLElement, state: State) {
   if (state.isPlaying) return;
   state.isPlaying = true;
   updatePlayButton(state);
-  scheduleNextTick(root, state);
+  // If an image is currently loading, don't start a timer yet — the
+  // onload handler (render's or swap's) will schedule the first tick
+  // once the slide is actually visible.
+  if (!state.isLoading) scheduleNextTick(root, state);
 }
 
 function pause(state: State) {
