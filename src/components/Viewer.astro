@@ -2,7 +2,10 @@
 import images from '../../data/images.json';
 ---
 <div id="viewer" class="viewer">
-  <img class="slide slide-a is-active" alt="" decoding="async" />
+  <!-- Both slides start invisible (opacity: 0). The runtime fades the
+       first one in on load via the same transition that swap() uses
+       so the page never shows a progressive top-to-bottom JPEG render. -->
+  <img class="slide slide-a" alt="" decoding="async" />
   <img class="slide slide-b" alt="" decoding="async" />
 
   <div class="chrome chrome-credit" aria-hidden="true">

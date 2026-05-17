@@ -143,14 +143,19 @@ function render(root: HTMLElement, state: State) {
     `.slide-${state.activeSlot}`,
   )!;
 
-  // Show the spinner during the very first image's network fetch too.
+  // Show the spinner during the very first image's network fetch.
   setLoading(state, true);
-  slotEl.onload = () => setLoading(state, false);
+  // Defer applying .is-active (which transitions opacity 0 → 1) until
+  // the image has fully loaded — otherwise the browser paints the JPEG
+  // top-to-bottom as bytes stream in.
+  slotEl.onload = () => {
+    setLoading(state, false);
+    slotEl.classList.add('is-active');
+  };
   slotEl.onerror = () => setLoading(state, false);
 
   slotEl.src = img.imageUrl;
   slotEl.alt = img.title;
-  slotEl.classList.add('is-active');
 
   const credit = root.querySelector<HTMLSpanElement>('#credit-text')!;
   credit.textContent = `${img.title.toUpperCase()} · ${img.credit.toUpperCase()}`;
