@@ -34,7 +34,7 @@ type State = {
 };
 
 /** Cycle order for the speed button, in milliseconds. */
-const SLIDESHOW_INTERVALS_MS = [12_000, 24_000, 48_000, 96_000];
+const SLIDESHOW_INTERVALS_MS = [8_000, 16_000, 32_000, 64_000];
 
 const READY_DELAY = 2000;
 const HIDE_CONTROLS_AFTER_MS = 3_000;
