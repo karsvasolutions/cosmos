@@ -16,6 +16,10 @@ type State = {
   history: number[];   // order[] indices the user has visited (for back)
   activeSlot: 'a' | 'b';
 
+  /** True while an image is in flight. Clicks are ignored during this
+      window so cursor/history only advance on actually-displayed slides. */
+  isLoading: boolean;
+
   // Slideshow
   isPlaying: boolean;
   slideshowTimer: number | null;
@@ -56,6 +60,8 @@ export function mountViewer() {
     cursor: 0,
     history: [],
     activeSlot: 'a',
+
+    isLoading: false,
 
     isPlaying: false,
     slideshowTimer: null,
@@ -132,6 +138,9 @@ function render(root: HTMLElement, state: State) {
 }
 
 function advance(root: HTMLElement, state: State) {
+  // Ignore clicks while an image is still in flight — cursor + history
+  // only advance once a slide has actually been shown.
+  if (state.isLoading) return;
   state.history.push(state.cursor);
   const next = nextImage(state);
   if (!next) return;
@@ -139,12 +148,15 @@ function advance(root: HTMLElement, state: State) {
 }
 
 function back(root: HTMLElement, state: State) {
+  if (state.isLoading) return;
   const prev = prevImage(state);
   if (!prev) return;
   swap(root, state, prev);
 }
 
 function swap(root: HTMLElement, state: State, img: Image) {
+  state.isLoading = true;
+
   const old = state.activeSlot;
   const nextSlot = old === 'a' ? 'b' : 'a';
   const oldEl = root.querySelector<HTMLImageElement>(`.slide-${old}`)!;
@@ -152,6 +164,7 @@ function swap(root: HTMLElement, state: State, img: Image) {
 
   // Handle image error: skip + remove + advance once more
   newEl.onerror = () => {
+    state.isLoading = false;
     console.warn('Image failed:', img.imageUrl);
     // Remove from underlying images by id so reshuffles don't re-pick it
     const idx = state.images.findIndex((i) => i.id === img.id);
@@ -160,13 +173,14 @@ function swap(root: HTMLElement, state: State, img: Image) {
     state.order = shuffle(state.images.length);
     state.cursor = 0;
     if (state.images.length > 0) {
-      swap(root, state, currentImage(state));
+      swap(root, state, currentImage(state));   // sets isLoading again
     } else {
       showLoadingFailure(root);
     }
   };
 
   newEl.onload = () => {
+    state.isLoading = false;
     newEl.classList.add('is-active');
     oldEl.classList.remove('is-active');
     state.activeSlot = nextSlot;
