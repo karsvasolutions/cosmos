@@ -60,7 +60,7 @@ Static site, built with Astro, deployed to Vercel free tier. Daily rebuild via G
 ┌─────────────────────────────────────────────────────────────┐
 │  GitHub Actions (daily at 12:00 UTC)                        │
 │  └─ npm run fetch                                           │
-│      └─ ingest script → data/images.json (max 500 entries)  │
+│      └─ ingest script → data/images.json (max 1500 entries)  │
 │      └─ commits & pushes if changed                         │
 │                                                             │
 │  Astro build (Vercel)                                       │
@@ -72,7 +72,7 @@ Static site, built with Astro, deployed to Vercel free tier. Daily rebuild via G
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Image binaries stay on NASA's CDN — the site stores only URLs and metadata. Expected `images.json` size: 200–400 KB for 500 entries.
+Image binaries stay on NASA's CDN — the site stores only URLs and metadata. Expected `images.json` size: ~1.5–2 MB for 1500 entries (median description ~900 chars).
 
 ## Data model
 
@@ -92,7 +92,7 @@ type Image = {
 };
 ```
 
-`data/images.json` is `Image[]`, sorted by `date` desc, capped at 500.
+`data/images.json` is `Image[]`, sorted by `date` desc, capped at 1500.
 
 **Normalization rules:**
 
@@ -104,7 +104,7 @@ type Image = {
 - Entries where `media_type !== "image"` (videos) — skipped.
 - Entries missing a credit string (`copyright`) — skipped. APOD includes credit for nearly every image.
 - Duplicates (same `imageUrl`) — first occurrence wins.
-- **Resolution gate**: each surviving entry's `imageUrl` is range-requested for the first ~64 KB at ingest time. The JPEG / PNG header is parsed for width. Entries < **2048 px wide** are dropped — too small to look sharp at viewport scale. Probe failures (network, unsupported format, malformed header) are also dropped (we only want known-high-res). The APOD adapter over-fetches (`APOD_CANDIDATES = 750`) so we still land near `MAX_ENTRIES` after this gate.
+- **Resolution gate**: each surviving entry's `imageUrl` is range-requested for the first ~64 KB at ingest time. The JPEG / PNG header is parsed for width. Entries < **2048 px wide** are dropped — too small to look sharp at viewport scale. Probe failures (network, unsupported format, malformed header) are also dropped (we only want known-high-res). The APOD adapter over-fetches (`APOD_CANDIDATES = 2500`, walking back up to 10 years of APOD history) so we still land near `MAX_ENTRIES = 1500` after this ~60 % pass-rate gate.
 
 ## Repository layout
 

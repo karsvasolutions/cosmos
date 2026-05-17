@@ -70,8 +70,10 @@ export async function fetchApod(opts: FetchApodOptions): Promise<Image[]> {
     end = new Date(start);
     end.setUTCDate(end.getUTCDate() - 1);
 
-    // Safety bound — don't page back more than ~3 years
-    if (end < new Date(today.getTime() - 3 * 365 * 86400_000)) break;
+    // Safety bound — don't page back more than ~15 years. APOD has
+    // run daily since 1995, so we have plenty of history available;
+    // 15 years covers ~5400 days × ~0.7 image-rate ≈ 3700 candidates.
+    if (end < new Date(today.getTime() - 15 * 365 * 86400_000)) break;
   }
 
   return collected.slice(0, opts.maxEntries);

@@ -4,11 +4,12 @@ import { probeImageWidth } from './probe';
 import { mergeAndCap, writeImages } from './write';
 import type { Image } from './types';
 
-const MAX_ENTRIES = 500;
+const MAX_ENTRIES = 1500;
 const MIN_ENTRIES = 50;
 /** Over-fetch from APOD so we still hit MAX_ENTRIES after rejecting
- *  low-resolution images. */
-const APOD_CANDIDATES = 750;
+ *  low-resolution images. Empirical acceptance rate is ~53%, so aim
+ *  for 2× the target. */
+const APOD_CANDIDATES = 3000;
 const MIN_WIDTH_PX = 2048;
 const PROBE_CONCURRENCY = 20;
 const OUTPUT = resolve(process.cwd(), 'data/images.json');
