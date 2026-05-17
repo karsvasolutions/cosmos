@@ -13,7 +13,13 @@ import images from '../../data/images.json';
   </div>
 
   <div class="loader" aria-hidden="true">
-    <div class="loader-ring"></div>
+    <div class="loader-system">
+      <span class="loader-star loader-star-1"></span>
+      <span class="loader-star loader-star-2"></span>
+      <span class="loader-star loader-star-3"></span>
+      <span class="loader-orbit"><span class="loader-planet"></span></span>
+      <span class="loader-sun"></span>
+    </div>
   </div>
 </div>
 
@@ -114,19 +120,59 @@ import images from '../../data/images.json';
     opacity: 1;
     transition: opacity 200ms ease 250ms;
   }
-  .loader-ring {
-    width: 32px;
-    height: 32px;
-    border: 2px solid rgba(255, 255, 255, 0.12);
-    border-top-color: rgba(255, 255, 255, 0.65);
-    border-radius: 50%;
-    animation: cosmos-spin 0.9s linear infinite;
+  /* Tiny solar system: a glowing sun, one orbiting planet, and a few
+     twinkling stars in the corners. ~56 × 56 px footprint. */
+  .loader-system {
+    position: relative;
+    width: 56px;
+    height: 56px;
   }
-  @keyframes cosmos-spin {
+  .loader-sun {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 6px; height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.45);
+  }
+  .loader-orbit {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    animation: cosmos-orbit 1.8s linear infinite;
+  }
+  .loader-planet {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 4px; height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: #ffffff;
+  }
+  .loader-star {
+    position: absolute;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    animation: cosmos-twinkle 2.4s ease-in-out infinite;
+  }
+  .loader-star-1 { top: 3px;    left: 5px;    animation-delay: 0s; }
+  .loader-star-2 { top: 9px;    right: 4px;   animation-delay: 0.8s; }
+  .loader-star-3 { bottom: 6px; left: 12px;   animation-delay: 1.5s; }
+
+  @keyframes cosmos-orbit {
     to { transform: rotate(360deg); }
   }
+  @keyframes cosmos-twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.7); }
+    50%      { opacity: 1;   transform: scale(1);   }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .loader-ring { animation: none; }
+    .loader-orbit,
+    .loader-star { animation: none; }
   }
 
   .chrome {
