@@ -14,9 +14,6 @@ import images from '../../data/images.json';
 
   <div class="loader" aria-hidden="true">
     <div class="loader-system">
-      <span class="loader-star loader-star-1"></span>
-      <span class="loader-star loader-star-2"></span>
-      <span class="loader-star loader-star-3"></span>
       <span class="loader-orbit loader-orbit-mercury">
         <span class="loader-planet loader-planet-mercury"></span>
       </span>
@@ -128,8 +125,8 @@ import images from '../../data/images.json';
     opacity: 1;
     transition: opacity 200ms ease 250ms;
   }
-  /* Tiny solar system: a glowing sun, one orbiting planet, and a few
-     twinkling stars in the corners. ~56 × 56 px footprint. */
+  /* Tiny solar system: a glowing sun with three planets orbiting it.
+     56 × 56 px footprint. */
   .loader-system {
     position: relative;
     width: 56px;
@@ -180,31 +177,12 @@ import images from '../../data/images.json';
     top: -2px;
     margin-left: -2px;
   }
-  .loader-star {
-    position: absolute;
-    width: 2px; height: 2px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    animation: cosmos-twinkle 2.4s ease-in-out infinite;
-  }
-  /* Earth's orbit has a radius of 24 inside the 56-px system. Push the
-     stars out into the corners (distance from centre ≥ 33 px) so the
-     planets' path never visually intersects them. */
-  .loader-star-1 { top: 2px;     left: 3px;    animation-delay: 0s; }
-  .loader-star-2 { top: 4px;     right: 2px;   animation-delay: 0.8s; }
-  .loader-star-3 { bottom: 3px;  right: 4px;   animation-delay: 1.5s; }
-
   @keyframes cosmos-orbit {
     to { transform: rotate(360deg); }
   }
-  @keyframes cosmos-twinkle {
-    0%, 100% { opacity: 0.2; transform: scale(0.7); }
-    50%      { opacity: 1;   transform: scale(1);   }
-  }
 
   @media (prefers-reduced-motion: reduce) {
-    .loader-orbit,
-    .loader-star { animation: none; }
+    .loader-orbit { animation: none; }
   }
 
   .chrome {
