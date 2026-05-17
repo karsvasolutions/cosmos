@@ -77,6 +77,7 @@ export function mountViewer() {
 
   render(root, state);
   attachInputs(root, state);
+  updatePrevButton(state); // history starts empty → prev disabled
 
   publishCurrentImage(currentImage(state));
 
@@ -121,20 +122,19 @@ function nextImage(state: State): Image | null {
 }
 
 function prevImage(state: State): Image | null {
-  if (state.order.length === 0) return null;
-  if (state.history.length > 0) {
-    // Walk back through the session's forward breadcrumbs first.
-    state.cursor = state.history.pop()!;
-  } else if (state.cursor === 0) {
-    // History exhausted and we're at the start of the shuffle —
-    // wrap to the end so the user can keep going back indefinitely.
-    state.cursor = state.order.length - 1;
-  } else {
-    // History exhausted but there's still room in the shuffle to go
-    // back through; step one position backwards.
-    state.cursor--;
-  }
+  // Back navigation is bounded by the session: the user can retrace
+  // their forward path but not go further back. When history is empty
+  // the prev button should already be visually disabled (handled by
+  // updatePrevButton), so this null path is a safety net.
+  if (state.history.length === 0) return null;
+  state.cursor = state.history.pop()!;
   return currentImage(state);
+}
+
+function updatePrevButton(state: State) {
+  const btn = document.getElementById('ctrl-prev') as HTMLButtonElement | null;
+  if (!btn) return;
+  btn.disabled = state.history.length === 0;
 }
 
 function render(root: HTMLElement, state: State) {
@@ -172,6 +172,7 @@ function advance(root: HTMLElement, state: State) {
   state.history.push(state.cursor);
   const next = nextImage(state);
   if (!next) return;
+  updatePrevButton(state);
   swap(root, state, next);
 }
 
@@ -179,6 +180,7 @@ function back(root: HTMLElement, state: State) {
   if (state.isLoading) return;
   const prev = prevImage(state);
   if (!prev) return;
+  updatePrevButton(state);
   swap(root, state, prev);
 }
 

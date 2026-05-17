@@ -179,12 +179,16 @@ import images from '../../data/images.json';
     cursor: pointer;
     transition: color var(--motion-cue) ease, background var(--motion-cue) ease, transform var(--motion-cue) ease;
   }
-  .ctrl:hover,
-  .ctrl:focus-visible {
+  .ctrl:not(:disabled):hover,
+  .ctrl:not(:disabled):focus-visible {
     color: var(--text-primary);
     background: rgba(10, 10, 15, 0.85);
   }
-  .ctrl:active { transform: scale(0.96); }
+  .ctrl:not(:disabled):active { transform: scale(0.96); }
+  .ctrl:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
 
   /* Lucide-style line icons — single weight, rounded joins */
   .icon {
