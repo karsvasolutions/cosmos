@@ -121,8 +121,19 @@ function nextImage(state: State): Image | null {
 }
 
 function prevImage(state: State): Image | null {
-  if (state.history.length === 0) return null;
-  state.cursor = state.history.pop()!;
+  if (state.order.length === 0) return null;
+  if (state.history.length > 0) {
+    // Walk back through the session's forward breadcrumbs first.
+    state.cursor = state.history.pop()!;
+  } else if (state.cursor === 0) {
+    // History exhausted and we're at the start of the shuffle —
+    // wrap to the end so the user can keep going back indefinitely.
+    state.cursor = state.order.length - 1;
+  } else {
+    // History exhausted but there's still room in the shuffle to go
+    // back through; step one position backwards.
+    state.cursor--;
+  }
   return currentImage(state);
 }
 
