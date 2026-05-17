@@ -20,6 +20,9 @@ type State = {
       window so cursor/history only advance on actually-displayed slides. */
   isLoading: boolean;
 
+  /** URLs we've already kicked off a preload for, to skip duplicates. */
+  preloadedUrls: Set<string>;
+
   // Slideshow
   isPlaying: boolean;
   slideshowTimer: number | null;
@@ -62,6 +65,7 @@ export function mountViewer() {
     activeSlot: 'a',
 
     isLoading: false,
+    preloadedUrls: new Set<string>(),
 
     isPlaying: false,
     slideshowTimer: null,
@@ -204,11 +208,24 @@ function preloadNext(state: State) {
   if (state.cursor >= state.order.length - 1) return;
   const nextImg = state.images[state.order[state.cursor + 1]!]!;
   if (!nextImg) return;
+  const url = nextImg.imageUrl;
+  if (state.preloadedUrls.has(url)) return;
+  state.preloadedUrls.add(url);
+
+  // High-priority hint to the browser. Unlike rel="prefetch" (which
+  // Chromium defers until idle), rel="preload" tells the browser to
+  // fetch now.
   const link = document.createElement('link');
-  link.rel = 'prefetch';
+  link.rel = 'preload';
   link.as = 'image';
-  link.href = nextImg.imageUrl;
+  link.href = url;
   document.head.appendChild(link);
+
+  // Belt-and-braces: a detached <img> actually initiates the fetch
+  // in every browser, lands the bytes in the HTTP cache, and makes
+  // the eventual real <img> swap effectively instant.
+  const img = new Image();
+  img.src = url;
 }
 
 function showLoadingFailure(root: HTMLElement) {
