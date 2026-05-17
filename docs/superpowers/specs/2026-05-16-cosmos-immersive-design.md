@@ -104,6 +104,7 @@ type Image = {
 - Entries where `media_type !== "image"` (videos) — skipped.
 - Entries missing a credit string (`copyright`) — skipped. APOD includes credit for nearly every image.
 - Duplicates (same `imageUrl`) — first occurrence wins.
+- **Resolution gate**: each surviving entry's `imageUrl` is range-requested for the first ~64 KB at ingest time. The JPEG / PNG header is parsed for width. Entries < **2048 px wide** are dropped — too small to look sharp at viewport scale. Probe failures (network, unsupported format, malformed header) are also dropped (we only want known-high-res). The APOD adapter over-fetches (`APOD_CANDIDATES = 750`) so we still land near `MAX_ENTRIES` after this gate.
 
 ## Repository layout
 
