@@ -8,6 +8,10 @@ import images from '../../data/images.json';
   <div class="chrome chrome-credit" aria-hidden="true">
     <span id="credit-text"></span>
   </div>
+
+  <div class="loader" aria-hidden="true">
+    <div class="loader-ring"></div>
+  </div>
 </div>
 
 <!-- Controls live OUTSIDE the viewer so they stay fixed to the viewport
@@ -89,6 +93,38 @@ import images from '../../data/images.json';
     transition: opacity var(--motion-fade) ease-in-out;
   }
   .slide.is-active { opacity: 1; }
+
+  /* Loading spinner — appears only after the load has been in flight
+     for ~250 ms so quick swaps don't flash a spinner. Fades out
+     instantly when loading completes. */
+  .loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 200ms ease 0ms;
+  }
+  :global(body.is-loading) .loader {
+    opacity: 1;
+    transition: opacity 200ms ease 250ms;
+  }
+  .loader-ring {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-top-color: rgba(255, 255, 255, 0.65);
+    border-radius: 50%;
+    animation: cosmos-spin 0.9s linear infinite;
+  }
+  @keyframes cosmos-spin {
+    to { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .loader-ring { animation: none; }
+  }
 
   .chrome {
     position: absolute;

@@ -131,6 +131,12 @@ function render(root: HTMLElement, state: State) {
   const slotEl = root.querySelector<HTMLImageElement>(
     `.slide-${state.activeSlot}`,
   )!;
+
+  // Show the spinner during the very first image's network fetch too.
+  setLoading(state, true);
+  slotEl.onload = () => setLoading(state, false);
+  slotEl.onerror = () => setLoading(state, false);
+
   slotEl.src = img.imageUrl;
   slotEl.alt = img.title;
   slotEl.classList.add('is-active');
@@ -139,6 +145,13 @@ function render(root: HTMLElement, state: State) {
   credit.textContent = `${img.title.toUpperCase()} · ${img.credit.toUpperCase()}`;
 
   preloadNext(state);
+}
+
+/** Single source of truth — keeps state.isLoading and the DOM class
+    (which drives the spinner) in sync. */
+function setLoading(state: State, value: boolean) {
+  state.isLoading = value;
+  document.body.classList.toggle('is-loading', value);
 }
 
 function advance(root: HTMLElement, state: State) {
@@ -159,7 +172,7 @@ function back(root: HTMLElement, state: State) {
 }
 
 function swap(root: HTMLElement, state: State, img: Image) {
-  state.isLoading = true;
+  setLoading(state, true);
 
   const old = state.activeSlot;
   const nextSlot = old === 'a' ? 'b' : 'a';
@@ -168,7 +181,7 @@ function swap(root: HTMLElement, state: State, img: Image) {
 
   // Handle image error: skip + remove + advance once more
   newEl.onerror = () => {
-    state.isLoading = false;
+    setLoading(state, false);
     console.warn('Image failed:', img.imageUrl);
     // Remove from underlying images by id so reshuffles don't re-pick it
     const idx = state.images.findIndex((i) => i.id === img.id);
@@ -184,7 +197,7 @@ function swap(root: HTMLElement, state: State, img: Image) {
   };
 
   newEl.onload = () => {
-    state.isLoading = false;
+    setLoading(state, false);
     newEl.classList.add('is-active');
     oldEl.classList.remove('is-active');
     state.activeSlot = nextSlot;
